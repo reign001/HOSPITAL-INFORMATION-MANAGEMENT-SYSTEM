@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .outpatient-container {
+        max-width: 900px;
+        margin: 30px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+        font-family: "Segoe UI", Tahoma, sans-serif;
+    }
+
+    .outpatient-container h2 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .outpatient-form {
+        margin-bottom: 25px;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 8px;
+    }
+
+    .outpatient-form div {
+        margin-bottom: 12px;
+    }
+
+    .outpatient-form label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 5px;
+        color: #34495e;
+    }
+
+    .outpatient-form input,
+    .outpatient-form select,
+    .outpatient-form textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #dcdcdc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .outpatient-form input:focus,
+    .outpatient-form select:focus,
+    .outpatient-form textarea:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0px 0px 4px rgba(52, 152, 219, 0.5);
+    }
+
+    .outpatient-form button {
+        background: #3498db;
+        border: none;
+        padding: 10px 20px;
+        color: white;
+        font-weight: 500;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+
+    .outpatient-form button:hover {
+        background: #2980b9;
+    }
+
+    .stats {
+        margin: 20px 0;
+        padding: 15px;
+        background: #f0f8ff;
+        border-left: 4px solid #3498db;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .outpatient-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .outpatient-table th,
+    .outpatient-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+
+    .outpatient-table th {
+        background: #3498db;
+        color: white;
+        font-weight: 600;
+    }
+
+    .outpatient-table tr:hover {
+        background: #f9f9f9;
+    }
+
+    .action-links a,
+    .action-links button {
+        margin-right: 8px;
+        font-size: 13px;
+        text-decoration: none;
+    }
+
+    .action-links a {
+        color: #3498db;
+        font-weight: 500;
+    }
+
+    .action-links a:hover {
+        text-decoration: underline;
+    }
+
+    .action-links button {
+        background: #e74c3c;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .action-links button:hover {
+        background: #c0392b;
+    }
+</style>
+
+<div class="outpatient-container">
+    <h2>Outpatient Records</h2>
+
+    <form method="POST" class="outpatient-form">
+        {{ form.hidden_tag() }}
+        <div>{{ form.patient_name.label }} {{ form.patient_name() }}</div>
+        <div>{{ form.sex.label }} {{ form.sex() }}</div>
+        <div>{{ form.age.label }} {{ form.age() }}</div>
+        <div>{{ form.address.label }} {{ form.address() }}</div>
+        <div>{{ form.medications_given.label }} {{ form.medications_given() }}</div>
+        <div>{{ form.nhis_status.label }} {{ form.nhis_status() }}</div>
+        {{ form.submit(class="btn") }}
+    </form>
+
+    <div class="stats">
+        <p><b>Daily Total:</b> {{ daily_total }}</p>
+        <p><b>Monthly Total:</b> {{ monthly_total }}</p>
+        <p><b>Yearly Total:</b> {{ yearly_total }}</p>
+        <p><b>NHIS:</b> {{ nhis_count }} | <b>NON-NHIS:</b> {{ non_nhis_count }}</p>
+    </div>
+
+    <table class="outpatient-table">
+        <tr>
+            <th>Name</th>
+            <th>Sex</th>
+            <th>Age</th>
+            <th>Visited</th>
+            <th>NHIS</th>
+            <th>Medications</th>
+            <th>Actions</th>
+        </tr>
+        {% for p in outpatients %}
+        <tr>
+            <td>{{ p.patient_name }}</td>
+            <td>{{ p.sex }}</td>
+            <td>{{ p.age }}</td>
+            <td>{{ p.visited_at.strftime("%Y-%m-%d") }}</td>
+            <td>{{ p.nhis_status }}</td>
+            <td>{{ p.medications_given }}</td>
+            <td class="action-links">
+                <a href="{{ url_for('outpatient.outpatient_detail', patient_id=p.id) }}">View</a>
+                <a href="{{ url_for('outpatient.edit_outpatient', patient_id=p.id) }}">Edit</a>
+                <form method="POST" action="{{ url_for('outpatient.delete_outpatient', patient_id=p.id) }}" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Delete this record?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

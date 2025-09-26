@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="login-wrapper d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="login-card shadow-lg rounded-4 p-5 bg-white" style="max-width: 420px; width: 100%;">
+        
+        <!-- Title -->
+        <h2 class="mb-4 text-center fw-bold" style="color: #2c3e50; letter-spacing: 1px;">
+            🔐 Secure Login
+        </h2>
+
+        <!-- Login Form -->
+        <form method="post" class="login-form">
+            <!-- Username -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-secondary">Username</label>
+                <input type="text" 
+                       name="username" 
+                       class="form-control custom-input rounded-pill px-3 py-2 shadow-sm border-0" 
+                       placeholder="Enter your username" required>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold text-secondary">Password</label>
+                <input type="password" 
+                       name="password" 
+                       class="form-control custom-input rounded-pill px-3 py-2 shadow-sm border-0" 
+                       placeholder="Enter your password" required>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" 
+                    class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm login-btn">
+                🔓 Login
+            </button>
+        </form>
+
+        <!-- Divider -->
+        <hr class="my-5">
+
+        <!-- Admin Tools -->
+        <div class="admin-tools text-center">
+            <p class="fw-bold mb-3 text-secondary">⚙️ Admin Tools</p>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="{{ url_for('auth.add_admin') }}" 
+                   class="btn btn-gradient-green btn-sm rounded-pill px-3 shadow-sm">
+                   ➕ Add Admin
+                </a>
+                <a href="{{ url_for('auth.manage_admins') }}" 
+                   class="btn btn-gradient-blue btn-sm rounded-pill px-3 shadow-sm">
+                   👥 Manage Admins
+                </a>
+                <a href="{{ url_for('auth.reset_superadmin') }}" 
+                   class="btn btn-gradient-orange btn-sm rounded-pill px-3 shadow-sm">
+                   🔑 Reset Superadmin
+                </a>
+            </div>
+
+            <p class="text-muted mt-4 small fst-italic">
+                To reset a specific admin's password: open <em>Manage Admins</em> and use the 
+                <strong>"Reset Password"</strong> button.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Input Focus Effect */
+    .custom-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(46, 134, 222, 0.25);
+    }
+
+    /* Gradient Button Styles */
+    .btn-gradient-green {
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+        color: #fff;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-gradient-green:hover {
+        background: linear-gradient(45deg, #2ecc71, #27ae60);
+        transform: translateY(-2px);
+    }
+
+    .btn-gradient-blue {
+        background: linear-gradient(45deg, #2980b9, #3498db);
+        color: #fff;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-gradient-blue:hover {
+        background: linear-gradient(45deg, #3498db, #2980b9);
+        transform: translateY(-2px);
+    }
+
+    .btn-gradient-orange {
+        background: linear-gradient(45deg, #e67e22, #f39c12);
+        color: #fff;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-gradient-orange:hover {
+        background: linear-gradient(45deg, #f39c12, #e67e22);
+        transform: translateY(-2px);
+    }
+
+    /* Login button hover effect */
+    .login-btn {
+        background: linear-gradient(45deg, #1d6fa5, #2980b9);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .login-btn:hover {
+        background: linear-gradient(45deg, #2980b9, #1d6fa5);
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}

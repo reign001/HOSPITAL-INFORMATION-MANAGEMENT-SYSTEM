@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>New Surgery Record</title>
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h2, h3 {
+      color: #1976d2;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      margin-bottom: 30px;
+    }
+
+    form label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 5px;
+      margin-top: 15px;
+    }
+
+    form input[type="text"],
+    form input[type="number"],
+    form input[type="date"],
+    form select,
+    form textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #ced4da;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: all 0.2s ease-in-out;
+    }
+
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+      outline: none;
+      border-color: #1976d2;
+      box-shadow: 0 0 6px rgba(25, 118, 210, 0.3);
+    }
+
+    form textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background-color: #28a745;
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background-color: #1e7e34;
+    }
+
+    a.history-btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #1976d2;
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    a.history-btn:hover {
+      background-color: #115293;
+    }
+
+    /* Responsive */
+    @media(max-width: 768px){
+      .container {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- New Surgery Record Form -->
+    <div class="card">
+      <h2>📝 New Surgery Record</h2>
+      <form method="POST" action="{{ url_for('surgery.add_surgery') }}">
+        <label>Full Name:</label>
+        <input type="text" name="patient_name" required>
+
+        <label>Surname:</label>
+        <input type="text" name="surname" required>
+
+        <label>Hospital Number:</label>
+        <input type="text" name="hospital_number" required>
+
+        <label>Age:</label>
+        <input type="number" name="age" required>
+
+        <label>Sex:</label>
+        <select name="patient_sex" required>
+          <option value="">Select Sex</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+          <option value="OTHER">Other</option>
+        </select>
+
+        <label>Date of Surgery:</label>
+        <input type="date" name="start_time" required>
+
+        <label>Diagnosis:</label>
+        <textarea name="diagnosis"></textarea>
+
+        <label>Procedure Done:</label>
+        <textarea name="surgery_done"></textarea>
+
+        <label>Findings:</label>
+        <textarea name="findings"></textarea>
+
+        <label>Estimated Blood Loss:</label>
+        <input type="text" name="estimated_blood_loss">
+
+        <label>Type of Anesthesia:</label>
+        <input type="text" name="anesthesia_type">
+
+        <label>Surgeon Name:</label>
+        <input type="text" name="surgeon_name">
+
+        <label>Assisting Surgeon:</label>
+        <input type="text" name="assistant_name">
+
+        <label>Anaesthetist Name:</label>
+        <input type="text" name="anaesthetist_name">
+
+        <label>Duration (minutes):</label>
+        <input type="number" name="duration_minutes">
+
+        <label>Post-op Condition:</label>
+        <textarea name="post_op_condition"></textarea>
+
+        <label>Notes:</label>
+        <textarea name="notes"></textarea>
+
+        <button type="submit">💾 Save Record</button>
+      </form>
+    </div>
+
+    {% if surgery %}
+    <!-- Update Surgery Form -->
+    <div class="card">
+      <h3>✏️ Update Surgery Record</h3>
+      <form method="POST" action="{{ url_for('surgery.update_surgery', surgery_id=surgery.id) }}">
+        <!-- You can pre-fill fields with surgery data -->
+        <button type="submit">🔄 Update</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <!-- Surgery History Link -->
+    <a href="{{ url_for('surgery.history') }}" class="history-btn">📜 View Surgery History</a>
+  </div>
+</body>
+</html>

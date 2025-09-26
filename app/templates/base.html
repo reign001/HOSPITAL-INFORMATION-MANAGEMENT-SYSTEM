@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital HIMS</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+            <span>Welcome, {{ current_user.username }} {{ current_user.role }}</span> 
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a> 
+            <a href="{{ url_for('index') }}" class="home-btn"> Home</a>
+
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul>
+              {% for category, msg in messages %}
+                <li class="{{ category }}">{{ msg }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
+
+<style>
+    .home-btn {
+        position: fixed;
+        top: 85px;
+        right: 25px;
+        background: #3498db;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        transition: 0.3s ease;
+        z-index: 1000;
+    }
+
+    .home-btn:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+    }
+
+
+        .logout-btn {
+        position: fixed;
+        top: 25px;
+        right: 25px;
+        background: #3498db;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+        transition: 0.3s ease;
+        z-index: 1000;
+    }
+
+    .home-btn:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+    }
+</style>

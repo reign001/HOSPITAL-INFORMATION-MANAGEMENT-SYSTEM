@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="patient-records-container">
+
+  <!-- Header & Add Button -->
+   <a href="{{ url_for('patients.patients_by_year', year=2025) }}"
+   style="display:inline-block; background: linear-gradient(135deg, #0288d1, #26c6da);
+          color: #fff; text-decoration:none; padding:10px 18px; border-radius:8px;
+          font-weight:500; font-size:0.95rem; box-shadow:0 4px 12px rgba(0,0,0,0.15);
+          transition: all 0.3s ease;">
+  📋 View Yearly Report
+</a>
+
+<a href="{{ url_for('patients.yearly_summary') }}"
+   style="display:inline-block; background: linear-gradient(135deg, #43a047, #66bb6a);
+          color: #fff; text-decoration:none; padding:10px 18px; border-radius:8px;
+          font-weight:500; font-size:0.95rem; box-shadow:0 4px 12px rgba(0,0,0,0.15);
+          transition: all 0.3s ease;"
+   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(0,0,0,0.2)';"
+   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';">
+  📊 View Yearly Totals Summary
+</a>
+  <div class="header-actions">
+    <h2>🧾 Patient Records</h2>
+    <a href="{{ url_for('patients.new_patient') }}" class="btn add-btn">+ Add Patient</a>
+  </div>
+
+  <!-- Search Form -->
+  <form method="get" action="{{ url_for('patients.list_patients') }}" class="search-form">
+    <input type="text" name="q" placeholder="Search by surname, first name, phone, address or hospital no"
+           value="{{ query or '' }}">
+    <button type="submit">🔍 Search</button>
+  </form>
+
+  <!-- Patient Table -->
+  <div class="table-container">
+    <table class="patient-table">
+      <thead>
+        <tr>
+          <th>Hospital #</th>
+          <th>Surname</th>
+          <th>First Name</th>
+          <th>Middle Name</th>
+          <th>Age</th>
+          <th>Sex</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>NHIS</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for patient in patients %}
+        <tr>
+          <td>{{ patient.hospital_number }}</td>
+          <td>{{ patient.surname }}</td>
+          <td>{{ patient.first_name }}</td>
+          <td>{{ patient.middle_name or "-" }}</td>
+          <td>{{ patient.age }}</td>
+          <td>{{ patient.sex.value }}</td>
+          <td>{{ patient.phone_number or "-" }}</td>
+          <td>{{ patient.address or "-" }}</td>
+          <td>{{ patient.nhis_status.value }}</td>
+          <td class="actions-cell">
+            <a href="{{ url_for('patients.patient_detail', patient_id=patient.id) }}" class="btn view-btn">View</a>
+            <a href="{{ url_for('patients.edit_patient', patient_id=patient.id) }}" class="btn edit-btn">Edit</a>
+            <form action="{{ url_for('patients.delete_patient', patient_id=patient.id) }}" method="post">
+              <button type="submit" class="btn delete-btn" onclick="return confirm('Delete this patient?')">Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="10" class="no-data">No patients found</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+/* Container */
+.patient-records-container {
+  padding: 40px 20px;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+}
+
+/* Header & Add Button */
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.header-actions h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.add-btn {
+  background-color: #0288d1;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.add-btn:hover {
+  background-color: #0277bd;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+/* Search Form */
+.search-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.search-form input:focus {
+  border-color: #0288d1;
+  box-shadow: 0 0 6px rgba(2,136,209,0.2);
+  outline: none;
+}
+
+.search-form button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background-color: #6c757d;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-form button:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+}
+
+/* Table Container */
+.table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* Table */
+.patient-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1000px;
+}
+
+.patient-table thead {
+  background-color: #0288d1;
+  color: #fff;
+}
+
+.patient-table th, .patient-table td {
+  padding: 12px 15px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.patient-table tbody tr {
+  background-color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.patient-table tbody tr:hover {
+  background-color: rgba(2,136,209,0.08);
+}
+
+/* Actions Buttons */
+.actions-cell {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #fff;
+}
+
+.view-btn {
+  background-color: #17a2b8;
+}
+
+.view-btn:hover {
+  background-color: #138496;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.edit-btn {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.edit-btn:hover {
+  background-color: #e0a800;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.delete-btn {
+  background-color: #dc3545;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* No Data Row */
+.no-data {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 15px 0;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-form button {
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}

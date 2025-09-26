@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+
+    <form method="post" style="max-width:800px; margin:40px auto; padding:40px; border-radius:14px; background-color:#ffffff; box-shadow:0 12px 30px rgba(0,0,0,0.1); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+
+        <h2 class="text-center mb-5" style="color:#2c3e50; font-weight:700; letter-spacing:1px;">💊 Dispense Drugs</h2>
+
+        <!-- Patient Information -->
+        <div class="mb-5">
+            <h5 class="mb-3" style="color:#34495e; font-weight:600;">Patient Information</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="patient_name" placeholder="First Name" value="{{ record.patient_name if record else '' }}" class="form-control shadow-sm" required>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="middle_name" placeholder="Middle Name" value="{{ record.middle_name if record else '' }}" class="form-control shadow-sm">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="surname" placeholder="Surname" value="{{ record.surname if record else '' }}" class="form-control shadow-sm" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="patient_age" placeholder="Age" value="{{ record.patient_age if record else '' }}" class="form-control shadow-sm">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="hospital_number" placeholder="Hospital Number" value="{{ record.hospital_number if record else '' }}" class="form-control shadow-sm" required>
+                </div>
+                <div class="col-md-3">
+                    <select name="sex" class="form-select shadow-sm" required>
+                        <option value="">--Select Sex--</option>
+                        <option value="Male" {% if record and record.sex=='Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if record and record.sex=='Female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if record and record.sex=='Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="phone_number" placeholder="Phone Number" value="{{ record.phone_number if record else '' }}" class="form-control shadow-sm">
+                </div>
+                <div class="col-md-6">
+                    <input type="text" name="address" placeholder="Address" value="{{ record.address if record else '' }}" class="form-control shadow-sm">
+                </div>
+                <div class="col-md-6">
+                    <select name="nhis_status" class="form-select shadow-sm">
+                        <option value="NON_NHIS" {% if record and record.nhis_status=='NON_NHIS' %}selected{% endif %}>NON_NHIS</option>
+                        <option value="NHIS" {% if record and record.nhis_status=='NHIS' %}selected{% endif %}>NHIS</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drugs Section -->
+        <h5 class="mb-3" style="color:#34495e; font-weight:600;">Select Drugs</h5>
+        <div class="mb-5">
+            {% if drugs %}
+                {% for drug in drugs %}
+                <div class="p-3 mb-2 border rounded d-flex align-items-center justify-content-between bg-light shadow-sm drug-row">
+                    <div>
+                        <input type="checkbox" name="drug_ids[]" value="{{ drug.id }}" class="drug-check me-2" data-price="{{ drug.unit_selling_price }}">
+                        <strong>{{ drug.name }}</strong> ({{ drug.brand_name }}) - <span class="text-primary">₦{{ "%.2f"|format(drug.unit_selling_price) }}</span>
+                    </div>
+                    <div>
+                        Qty: <input type="number" name="qty_{{ drug.id }}" value="0" min="0" class="qty-input shadow-sm" data-id="{{ drug.id }}">
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No drugs available</p>
+            {% endif %}
+        </div>
+
+        <!-- Amount Paid & Totals -->
+        <div class="mb-5">
+            <label class="form-label fw-bold" style="color:#34495e;">Amount Paid</label>
+            <input type="number" step="0.01" name="amount_paid" value="{{ record.amount_paid if record else '' }}" class="form-control shadow-sm">
+
+            <div class="mt-3 totals">
+                <p class="mb-1 fw-bold">Total Amount: <span class="text-success">₦<span id="totalAmount">{{ record.total_amount if record else '0.00' }}</span></span></p>
+                <p class="mb-1 fw-bold">Balance: <span class="text-danger">₦<span id="balance">{{ record.balance if record else '0.00' }}</span></span></p>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">💊 Dispense</button>
+
+        <!-- Records Links -->
+        <div class="mt-5 d-flex flex-wrap gap-3 justify-content-center record-links">
+            <a href="{{ url_for('dispensary.dispensary_records', period='day') }}" class="record-btn">📅 Daily Records</a>
+            <a href="{{ url_for('dispensary.dispensary_records', period='week') }}" class="record-btn">🗓️ Weekly Records</a>
+            <a href="{{ url_for('dispensary.dispensary_records', period='month') }}" class="record-btn">📆 Monthly Records</a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("input", function () {
+    let total = 0.0;
+    document.querySelectorAll(".drug-check:checked").forEach(function (checkbox) {
+        const price = parseFloat(checkbox.dataset.price);
+        const qtyInput = document.querySelector(`.qty-input[data-id="${checkbox.value}"]`);
+        const qty = parseInt(qtyInput.value) || 0;
+        total += price * qty;
+    });
+    document.getElementById("totalAmount").textContent = total.toFixed(2);
+
+    const amountPaid = parseFloat(document.querySelector('[name="amount_paid"]').value) || 0;
+    document.getElementById("balance").textContent = (total - amountPaid).toFixed(2);
+});
+</script>
+
+<style>
+/* Professional classy form styles */
+form input, form select {
+    transition: all 0.3s;
+    border-radius: 6px;
+    padding: 10px;
+}
+form input:focus, form select:focus {
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.4);
+    border-color: #3498db;
+}
+.drug-check {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+.drug-row {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.drug-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+.btn-primary {
+    font-size:16px;
+    transition: all 0.3s;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* Records Links Styling */
+.record-links .record-btn {
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-weight:600;
+    text-decoration:none;
+    color:#fff;
+    transition: all 0.3s;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    flex: 1 1 200px;
+    text-align:center;
+}
+.record-links .record-btn:nth-child(1) { background: #3498db; }
+.record-links .record-btn:nth-child(2) { background: #27ae60; }
+.record-links .record-btn:nth-child(3) { background: #f39c12; }
+
+.record-links .record-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.25);
+}
+</style>
+{% endblock %}

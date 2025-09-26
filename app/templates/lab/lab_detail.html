@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:850px; margin:40px auto; padding:30px; background:#ffffff; 
+            border-radius:15px; box-shadow:0 12px 25px rgba(0,0,0,0.1); font-family:'Roboto', sans-serif;">
+
+    <!-- Header -->
+    <div style="text-align:center; margin-bottom:25px;">
+        <h3 style="font-weight:700; font-size:1.9rem; color:#1976d2;">
+            🧪 Lab Visit Details
+        </h3>
+    </div>
+
+    <!-- Patient Info Rows -->
+    <div style="display:flex; flex-wrap:wrap; gap:20px;">
+
+        <div style="flex:1 1 45%; min-width:250px;">
+            <p><strong>Name:</strong> {{ visit.patient_name }} {{ visit.patient_surname }}</p>
+        </div>
+        <div style="flex:1 1 20%; min-width:100px;">
+            <p><strong>Age:</strong> {{ visit.patient_age }}</p>
+        </div>
+        <div style="flex:1 1 20%; min-width:100px;">
+            <p><strong>Sex:</strong> {{ visit.sex }}</p>
+        </div>
+
+        <div style="flex:1 1 30%; min-width:150px;">
+            <p><strong>NHIS Status:</strong> {{ visit.nhis_status }}</p>
+        </div>
+        <div style="flex:1 1 30%; min-width:150px;">
+            <p><strong>Patient Type:</strong> {{ visit.inpatient_status }}</p>
+        </div>
+        <div style="flex:1 1 30%; min-width:150px;">
+            <p><strong>Phone:</strong> {{ visit.phone_number }}</p>
+        </div>
+
+        <div style="flex:1 1 45%; min-width:250px;">
+            <p><strong>Sample:</strong> {{ visit.sample }}</p>
+        </div>
+        <div style="flex:1 1 45%; min-width:250px;">
+            <p><strong>Referring Physician:</strong> {{ visit.referring_physician }}</p>
+        </div>
+
+        <div style="flex:1 1 45%; min-width:250px;">
+            <p><strong>Laboratory Number:</strong> {{ visit.laboratory_number }}</p>
+        </div>
+        <div style="flex:1 1 45%; min-width:250px;">
+            <p><strong>Investigations:</strong> {{ visit.investigations }}</p>
+        </div>
+
+        <div style="flex:1 1 45%; min-width:250px;">
+            <p><strong>Amount Paid:</strong> 
+                <span style="display:inline-block; background:#4caf50; color:#fff; padding:5px 12px; border-radius:8px; font-weight:600;">
+                    ₦{{ visit.amount_paid }}
+                </span>
+            </p>
+        </div>
+        <div style="flex:1 1 45%; min-width:250px;">
+            <p><strong>Date:</strong> {{ visit.created_at.strftime("%Y-%m-%d %H:%M") }}</p>
+        </div>
+
+    </div>
+
+    <!-- Back Button -->
+    <div style="text-align:center; margin-top:30px;">
+        <a href="{{ url_for('lab.lab_index') }}" 
+           style="display:inline-block; background: linear-gradient(135deg, #1976d2, #42a5f5);
+                  color:#fff; text-decoration:none; padding:12px 28px; border-radius:10px;
+                  font-weight:600; font-size:1rem; box-shadow:0 6px 15px rgba(0,0,0,0.15);
+                  transition: all 0.3s ease;"
+           onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.2)';"
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 15px rgba(0,0,0,0.15)';">
+           ⬅ Back to Lab Records
+        </a>
+    </div>
+</div>
+{% endblock %}

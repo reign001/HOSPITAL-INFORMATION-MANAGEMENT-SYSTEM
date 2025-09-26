@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="patients-year-container">
+
+  <h2 class="page-title">📋 Patients Registered in {{ year }}</h2>
+  <p class="total-patients">Total Patients: <span class="badge">{{ total }}</span></p>
+
+  {% if patients %}
+  <div class="table-wrapper">
+    <table class="patients-table">
+      <thead>
+        <tr>
+          <th>Hospital #</th>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Sex</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for patient in patients %}
+        <tr>
+          <td>{{ patient.hospital_number }}</td>
+          <td>{{ patient.full_name() }}</td>
+          <td>{{ patient.age }}</td>
+          <td>{{ patient.sex.value }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="no-data-alert">
+    No patients found for {{ year }}.
+  </div>
+  {% endif %}
+
+  <a href="{{ url_for('patients.yearly_summary') }}" class="btn back-btn">⬅ Back to Yearly Summary</a>
+
+</div>
+
+<style>
+/* Container */
+.patients-year-container {
+  padding: 40px 20px;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  min-height: 100vh;
+}
+
+/* Page Title */
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Total Patients Badge */
+.total-patients {
+  font-weight: 500;
+  margin-bottom: 25px;
+}
+
+.total-patients .badge {
+  background-color: #0288d1;
+  color: #fff;
+  padding: 0.5em 0.75em;
+  font-size: 1rem;
+  border-radius: 8px;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+/* Table Styling */
+.patients-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 500px;
+}
+
+.patients-table thead {
+  background-color: #0288d1;
+  color: #fff;
+  text-align: center;
+}
+
+.patients-table th,
+.patients-table td {
+  padding: 12px 15px;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.patients-table tbody tr {
+  background-color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.patients-table tbody tr:hover {
+  background-color: rgba(2,136,209,0.08);
+}
+
+/* No Data Alert */
+.no-data-alert {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Back Button */
+.back-btn {
+  display: inline-block;
+  background-color: #6c757d;
+  color: #fff;
+  padding: 10px 20px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .patients-table {
+    min-width: 100%;
+  }
+}
+</style>
+{% endblock %}

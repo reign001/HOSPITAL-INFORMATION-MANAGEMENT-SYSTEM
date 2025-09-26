@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-sm mx-auto" style="max-width: 600px;">
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="mb-0">📝 Add New Patient</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('patients.new_patient') }}">
+                <!-- First Name -->
+                <div class="mb-3">
+                    <input type="text" name="first_name" class="form-control" placeholder="First Name" required>
+                </div>
+
+                <!-- Middle Name -->
+                <div class="mb-3">
+                    <input type="text" name="middle_name" class="form-control" placeholder="Middle Name">
+                </div>
+
+                <!-- Surname -->
+                <div class="mb-3">
+                    <input type="text" name="surname" class="form-control" placeholder="Surname" required>
+                </div>
+
+                <!-- Age -->
+                <div class="mb-3">
+                    <input type="number" name="age" class="form-control" placeholder="Age" required>
+                </div>
+
+                <!-- Gender -->
+                <div class="mb-3">
+                    <label for="sex" class="form-label">Gender:</label>
+                    <select name="sex" id="sex" class="form-select" required>
+                        <option value="">-- Select --</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Address -->
+                <div class="mb-3">
+                    <input type="text" name="address" class="form-control" placeholder="Address">
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-3">
+                    <input type="tel" name="phone" class="form-control" placeholder="Phone">
+                </div>
+
+                <!-- NHIS Status -->
+                <div class="mb-3">
+                    <label for="nhis_status" class="form-label">NHIS:</label>
+                    <select name="nhis_status" id="nhis_status" class="form-select" required>
+                        <option value="">-- Select --</option>
+                        <option value="NHIS">NHIS</option>
+                        <option value="NON-NHIS">NON-NHIS</option>
+                    </select>
+                </div>
+
+                <!-- Hospital Number -->
+                <div class="mb-3">
+                    <input type="text" name="hospital_number" class="form-control" placeholder="Hospital Number" required>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success btn-lg">💾 Save Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+    }
+
+    .card-header {
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        font-weight: 500;
+    }
+
+    .form-control, .form-select {
+        border-radius: 6px;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .btn {
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}

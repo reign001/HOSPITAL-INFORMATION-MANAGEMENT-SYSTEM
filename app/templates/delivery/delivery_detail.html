@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow-sm rounded-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Delivery Detail</h4>
+        </div>
+        <div class="card-body">
+
+            <!-- Mother Info -->
+            <h5 class="text-secondary mb-3">👩 Mother Information</h5>
+            <ul class="list-group list-group-flush mb-4">
+                <li class="list-group-item"><strong>Mother's Name:</strong> {{ delivery.mother_name }}</li>
+                <li class="list-group-item"><strong>NHIS Status:</strong> {{ delivery.nhis_status }}</li>
+                <li class="list-group-item"><strong>Delivery Type:</strong> {{ delivery.delivery_type }}</li>
+                {% if delivery.delivery_type == "CS" %}
+                    <li class="list-group-item"><strong>Indication for CS:</strong> {{ delivery.cs_indication }}</li>
+                {% endif %}
+                <li class="list-group-item"><strong>Delivery Date:</strong> {{ delivery.delivery_date.strftime("%Y-%m-%d") }}</li>
+                {% if delivery.delivery_time %}
+                    <li class="list-group-item"><strong>Delivery Time:</strong> {{ delivery.delivery_time.strftime("%H:%M") }}</li>
+                {% endif %}
+                <li class="list-group-item"><strong>Mother's Condition:</strong> {{ delivery.mother_condition }}</li>
+            </ul>
+
+            <!-- Baby Info -->
+            <h5 class="text-secondary mb-3">👶 Baby Information</h5>
+            <ul class="list-group list-group-flush mb-4">
+                <li class="list-group-item"><strong>Baby Gender:</strong> {{ delivery.baby_gender }}</li>
+                <li class="list-group-item"><strong>Baby Weight:</strong> {{ delivery.baby_weight }} kg</li>
+                <li class="list-group-item"><strong>Baby's Condition:</strong> {{ delivery.baby_condition }}</li>
+            </ul>
+
+            <div class="text-end">
+                <a href="{{ url_for('delivery.list_deliveries') }}" class="btn btn-secondary">← Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+    }
+    .card-header {
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+    .list-group-item strong {
+        color: #495057;
+    }
+</style>
+{% endblock %}

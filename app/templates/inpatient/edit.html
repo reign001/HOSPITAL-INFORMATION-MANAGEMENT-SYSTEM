@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold" style="color:#2c3e50; letter-spacing:1px;">
+            ✏️ Edit In-Patient Record
+        </h2>
+        <p class="text-muted">Update the patient’s details accurately and save changes.</p>
+        <hr class="mt-3" style="width:90px; margin:auto; border:2px solid #3498db; opacity:0.9;">
+    </div>
+
+    <!-- Edit Form Card -->
+    <form method="POST" class="card shadow-lg border-0 rounded-3 p-4 form-card">
+        {{ form.hidden_tag() }}
+
+        <div class="row g-4">
+            <!-- Hospital Number -->
+            <div class="col-md-6">
+                {{ form.hospital_number.label(class="form-label fw-semibold text-muted") }}
+                {{ form.hospital_number(class="form-control form-control-lg custom-input", id="hospital_number") }}
+            </div>
+
+            <!-- Patient Name -->
+            <div class="col-md-6">
+                {{ form.patient_name.label(class="form-label fw-semibold text-muted") }}
+                {{ form.patient_name(class="form-control form-control-lg custom-input", id="patient_name") }}
+            </div>
+
+            <!-- Sex -->
+            <div class="col-md-6">
+                {{ form.sex.label(class="form-label fw-semibold text-muted") }}
+                {{ form.sex(class="form-select form-select-lg custom-input", id="sex") }}
+            </div>
+
+            <!-- Age -->
+            <div class="col-md-6">
+                {{ form.age.label(class="form-label fw-semibold text-muted") }}
+                {{ form.age(class="form-control form-control-lg custom-input", id="age") }}
+            </div>
+
+            <!-- Diagnosis -->
+            <div class="col-md-12">
+                {{ form.diagnosis.label(class="form-label fw-semibold text-muted") }}
+                {{ form.diagnosis(class="form-control form-control-lg custom-input") }}
+            </div>
+
+            <!-- Medications Given -->
+            <div class="col-md-12">
+                {{ form.medications_given.label(class="form-label fw-semibold text-muted") }}
+                {{ form.medications_given(class="form-control form-control-lg custom-input") }}
+            </div>
+
+            <!-- Condition -->
+            <div class="col-md-12">
+                {{ form.condition.label(class="form-label fw-semibold text-muted") }}
+                {{ form.condition(class="form-control form-control-lg custom-input") }}
+            </div>
+
+            <!-- Status Section -->
+            <div class="col-md-12 mt-3">
+                <label class="fw-bold text-secondary mb-2">Patient Status</label>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                        {{ form.discharge(class="form-check-input") }}
+                        {{ form.discharge.label(class="form-check-label fw-semibold") }}
+                    </div>
+                    <div class="form-check">
+                        {{ form.referred(class="form-check-input") }}
+                        {{ form.referred.label(class="form-check-label fw-semibold") }}
+                    </div>
+                    <div class="form-check">
+                        {{ form.rip(class="form-check-input") }}
+                        {{ form.rip.label(class="form-check-label fw-semibold text-danger") }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discharge Date -->
+            <div class="col-md-6">
+                {{ form.discharged_at.label(class="form-label fw-semibold text-muted") }}
+                {{ form.discharged_at(class="form-control form-control-lg custom-input", id="discharged_at") }}
+            </div>
+
+            <!-- Admission Date -->
+            <div class="col-md-6">
+                {{ form.admitted_on.label(class="form-label fw-semibold text-muted") }}
+                {{ form.admitted_on(class="form-control form-control-lg custom-input", id="admitted_on") }}
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary w-100 mt-4 py-2 rounded-pill fw-semibold shadow-sm">
+            {{ form.submit.label.text or "Update Record" }}
+        </button>
+    </form>
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('inpatient.list_inpatients') }}" 
+           class="btn btn-outline-secondary px-4 py-2 rounded-pill shadow-sm fw-semibold">
+            ⬅ Back to List
+        </a>
+    </div>
+</div>
+
+<!-- Custom Styling -->
+<style>
+    .form-card {
+        background: linear-gradient(to right, #f8f9fa, #ffffff);
+        transition: transform 0.3s ease-in-out;
+    }
+    .form-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    }
+    .custom-input {
+        border-radius: 10px;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+    .custom-input:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+    }
+</style>
+{% endblock %}

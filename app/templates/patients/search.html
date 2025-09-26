@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="search-results-container">
+
+  <h2 class="search-title">🔍 Search Results for "<span class="highlight">{{ query }}</span>"</h2>
+
+  {% if results %}
+  <div class="table-wrapper">
+    <table class="search-table">
+      <thead>
+        <tr>
+          <th>Hospital #</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for patient in results %}
+        <tr>
+          <td>{{ patient.hospital_number }}</td>
+          <td>{{ patient.full_name() }}</td>
+          <td>{{ patient.phone_number or "-" }}</td>
+          <td>{{ patient.address or "-" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="no-results">
+    No patients found for "<strong>{{ query }}</strong>".
+  </div>
+  {% endif %}
+
+  <a href="{{ url_for('patients.list_patients') }}" class="btn back-btn">⬅ Back to Patient List</a>
+
+</div>
+
+<style>
+/* Container */
+.search-results-container {
+  padding: 40px 20px;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  min-height: 100vh;
+}
+
+/* Title */
+.search-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+.highlight {
+  color: #0288d1;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+/* Table Styling */
+.search-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 700px;
+}
+
+.search-table thead {
+  background-color: #0288d1;
+  color: #fff;
+  text-align: center;
+}
+
+.search-table th,
+.search-table td {
+  padding: 12px 15px;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.search-table tbody tr {
+  background-color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.search-table tbody tr:hover {
+  background-color: rgba(2,136,209,0.08);
+}
+
+/* No Results Alert */
+.no-results {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Back Button */
+.back-btn {
+  display: inline-block;
+  background-color: #6c757d;
+  color: #fff;
+  padding: 10px 20px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .search-table {
+    min-width: 100%;
+  }
+}
+</style>
+{% endblock %}

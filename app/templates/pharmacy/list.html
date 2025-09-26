@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="inventory-container">
+    <h2 class="page-title">📦 Pharmacy Inventory</h2>
+
+<div class="inventory-actions" style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
+
+    <!-- Add Drug Button -->
+    <a href="{{ url_for('pharmacy.add_drug') }}"
+       style="display:inline-block; background: linear-gradient(135deg, #1976d2, #42a5f5);
+              color:#fff; text-decoration:none; padding:12px 22px; border-radius:10px;
+              font-weight:600; font-size:0.95rem; box-shadow:0 6px 15px rgba(0,0,0,0.15);
+              transition: all 0.3s ease; text-align:center;"
+       onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.2)';"
+       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 15px rgba(0,0,0,0.15)';">
+        ➕ Add Drug
+    </a>
+
+    <!-- Dispense Drug Button -->
+    <a href="{{ url_for('pharmacy.dispense_drug') }}"
+       style="display:inline-block; background: linear-gradient(135deg, #2e7d32, #66bb6a);
+              color:#fff; text-decoration:none; padding:12px 22px; border-radius:10px;
+              font-weight:600; font-size:0.95rem; box-shadow:0 6px 15px rgba(0,0,0,0.15);
+              transition: all 0.3s ease; text-align:center;"
+       onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.2)';"
+       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 15px rgba(0,0,0,0.15)';">
+        💊 Dispense Drug
+    </a>
+
+</div>
+
+
+<table style="width:100%; border-collapse:collapse; margin-top:15px; font-family:Arial, sans-serif; font-size:14px; text-align:center;">
+    <thead>
+        <tr style="background-color:#f2f2f2; font-weight:bold;">
+            <th style="border:1px solid black; padding:8px;">ID</th>
+            <th style="border:1px solid black; padding:8px;">Generic Name</th>
+            <th style="border:1px solid black; padding:8px;">Brand Name</th>
+            <th style="border:1px solid black; padding:8px;">Quantity Supplied</th>
+            <th style="border:1px solid black; padding:8px;">Expiry</th>
+            <th style="border:1px solid black; padding:8px;">Unit Cost</th>
+            <th style="border:1px solid black; padding:8px;">Selling Price</th>
+            <th style="border:1px solid black; padding:8px;">Quantity Left</th>
+            <th style="border:1px solid black; padding:8px;">Dispensed Today</th>
+            <th style="border:1px solid black; padding:8px;">Dispensed This Month</th>
+            <th style="border:1px solid black; padding:8px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for drug in drugs %}
+        <tr style="background-color:{% if loop.index is even %}#fafafa{% else %}#ffffff{% endif %};">
+            <td style="border:1px solid black; padding:8px;">{{ drug.id }}</td>
+            <td style="border:1px solid black; padding:8px;">{{ drug.name }}</td>
+            <td style="border:1px solid black; padding:8px;">{{ drug.brand_name }}</td>
+            <td style="border:1px solid black; padding:8px;">{{ drug.quantity_supplied }}</td>
+            <td style="border:1px solid black; padding:8px;">{{ drug.expiry_date.strftime("%Y-%m-%d") }}</td>
+            <td style="border:1px solid black; padding:8px;">₦{{ "%.2f"|format(drug.unit_cost_price) }}</td>
+            <td style="border:1px solid black; padding:8px;">₦{{ "%.2f"|format(drug.unit_selling_price) }}</td>
+            <td style="border:1px solid black; padding:8px; {% if drug.quantity_left < 10 %}color:red; font-weight:bold;{% endif %}">
+                {{ drug.quantity_left }}
+            </td>
+            <td style="border:1px solid black; padding:8px;">{{ drug.dispensed_today }}</td>
+            <td style="border:1px solid black; padding:8px;">{{ drug.dispensed_month }}</td>
+            <td style="border:1px solid black; padding:8px;">
+                <a href="{{ url_for('pharmacy.restock_drug', drug_id=drug.id) }}" 
+                   style="background-color:#ffc107; color:black; padding:4px 8px; text-decoration:none; border-radius:4px; font-size:12px;">
+                   Restock
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+{% endblock %}
+
+<style>
+  /* General Container */
+.inventory-container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Page Title */
+.page-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* Action buttons */
+.inventory-actions {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: 0.3s;
+    color: #fff;
+}
+
+.btn-primary { background: #3498db; }
+.btn-primary:hover { background: #2980b9; }
+
+.btn-success { background: #27ae60; }
+.btn-success:hover { background: #1e8449; }
+
+.btn-warning { background: #f39c12; }
+.btn-warning:hover { background: #d68910; }
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+/* Table Styling */
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.inventory-table th, 
+.inventory-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.inventory-table th {
+    background: #f8f9fa;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.inventory-table tr:nth-child(even) {
+    background: #fdfdfd;
+}
+
+.inventory-table tr:hover {
+    background: #f1f7ff;
+}
+
+/* Highlight low stock */
+.low-stock {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+
+
+
+
+/* Table Styling */
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    border: 1px solid #ccc;  /* outer border */
+}
+
+.inventory-table th, 
+.inventory-table td {
+    border: 1px solid #ccc;  /* grid lines */
+    padding: 10px;
+    text-align: center;
+}
+
+.inventory-table th {
+    background: #f1f3f6;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.inventory-table tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.inventory-table tr:hover {
+    background: #f1f7ff;
+}
+
+</style>

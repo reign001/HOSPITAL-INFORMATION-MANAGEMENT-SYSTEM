@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:500px; margin:50px auto; padding:30px; border:1px solid #ddd; border-radius:8px; background-color:#f9f9f9; box-shadow:0 4px 10px rgba(0,0,0,0.1); font-family:Arial, sans-serif;">
+    
+    <h2 style="text-align:center; margin-bottom:25px; color:#333;">
+        🔄 Restock {{ drug.name }} ({{ drug.brand_name }})
+    </h2>
+    
+    <!-- Restock Form -->
+    <form method="post" style="display:flex; flex-direction:column; gap:15px; margin-bottom:20px;">
+        <label style="display:flex; flex-direction:column; font-weight:bold; color:#555;">
+            Add Quantity
+            <input type="number" name="added_quantity" min="1" required
+                   style="padding:8px; border:1px solid #ccc; border-radius:4px; font-size:14px;">
+        </label>
+        <button type="submit"
+                style="padding:10px; background-color:#28a745; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer; transition:0.3s;">
+            ✅ Update Stock
+        </button>
+    </form>
+    
+    <hr style="margin:25px 0; border:none; border-top:1px solid #ccc;">
+    
+    <!-- Delete stock button -->
+    <form method="post" action="{{ url_for('pharmacy.delete_drug', drug_id=drug.id) }}" 
+          onsubmit="return confirm('Are you sure you want to delete this drug from inventory?');"
+          style="margin-bottom:20px;">
+        <button type="submit" 
+                style="width:100%; padding:10px; background-color:#dc3545; color:white; border:none; border-radius:5px; font-size:16px; cursor:pointer; transition:0.3s;">
+            🗑️ Delete Drug
+        </button>
+    </form>
+    
+    <a href="{{ url_for('pharmacy.list_drugs') }}" 
+       style="display:inline-block; margin-top:10px; color:#007bff; text-decoration:none; font-weight:bold;">
+       ← Back to Inventory
+    </a>
+</div>
+{% endblock %}

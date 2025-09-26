@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Surgery Details</title>
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .details-box {
+      background: #fff;
+      padding: 30px 25px;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 15px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .details-box:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      text-decoration: none;
+      color: #6c757d;
+      transition: color 0.2s ease;
+    }
+
+    .close-btn:hover {
+      color: #dc3545;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      text-align: center;
+      color: #1976d2;
+      margin-bottom: 25px;
+    }
+
+    .details-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .details-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .details-list li:last-child {
+      border-bottom: none;
+    }
+
+    .details-list strong {
+      color: #555;
+    }
+
+    @media(max-width: 600px){
+      .details-box {
+        padding: 20px 15px;
+      }
+      .details-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px 0;
+      }
+      .details-list li span {
+        margin-top: 3px;
+        color: #1976d2;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="details-box">
+    <a href="{{ url_for('surgery.history') }}" class="close-btn">&times;</a>
+    <h2>🩺 Surgery Details</h2>
+    <ul class="details-list">
+      <li><strong>Date:</strong> <span>{{ op.start_time.strftime("%Y-%m-%d") }}</span></li>
+      <li><strong>Patient:</strong> <span>{{ op.patient_name }} {{ op.surname }}</span></li>
+      <li><strong>Hospital Number:</strong> <span>{{ op.hospital_number }}</span></li>
+      <li><strong>Sex:</strong> <span>{{ op.patient_sex.value }}</span></li>
+      <li><strong>Diagnosis:</strong> <span>{{ op.diagnosis }}</span></li>
+      <li><strong>Procedure:</strong> <span>{{ op.surgery_done }}</span></li>
+      <li><strong>Surgeon:</strong> <span>{{ op.surgeon_name }}</span></li>
+      <li><strong>Assistant:</strong> <span>{{ op.assistant_name }}</span></li>
+      <li><strong>Anaesthetist:</strong> <span>{{ op.anaesthetist_name }}</span></li>
+      <li><strong>Duration:</strong> <span>{{ op.duration_minutes }} minutes</span></li>
+    </ul>
+  </div>
+</body>
+</html>
+

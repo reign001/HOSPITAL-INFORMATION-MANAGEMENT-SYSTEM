@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Surgical History</title>
+
+</head>
+<body>
+  <div class="container">
+    <h2>🩺 Surgical History</h2>
+
+    <!-- Search Bar -->
+    <form method="GET" action="{{ url_for('surgery.history') }}" class="search-bar">
+      <input type="text" name="q" placeholder="Search by patient name or hospital number" value="{{ request.args.get('q', '') }}">
+      <button type="submit">Search</button>
+    </form>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>First Name</th>
+            <th>Surname</th>
+            <th>Hospital #</th>
+            <th>Sex</th>
+            <th>Age</th>
+            <th>Diagnosis</th>
+            <th>Procedure</th>
+            <th>Surgeon</th>
+            <th>Assistant</th>
+            <th>Anaesthetist</th>
+            <th>Duration</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for op in surgeries %}
+          <tr>
+            <td>{{ op.start_time.strftime("%Y-%m-%d") }}</td>
+            <td>{{ op.patient_name }}</td>
+            <td>{{ op.surname }}</td>
+            <td>{{ op.hospital_number }}</td>
+            <td>{{ op.patient_sex.value }}</td>
+            <td>{{ op.patient_age }}</td>
+            <td>{{ op.diagnosis }}</td>
+            <td>{{ op.surgery_done }}</td>
+            <td>{{ op.surgeon_name }}</td>
+            <td>{{ op.assistant_name }}</td>
+            <td>{{ op.anaesthetist_name }}</td>
+            <td>{{ op.duration_minutes }} mins</td>
+            <td><a href="{{ url_for('surgery.details', id=op.id) }}" class="details-btn">View</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <a href="{{ url_for('surgery.add_surgery') }}" class="add-btn">➕ Add Surgery Record</a>
+
+    <!-- Summary -->
+    <div class="summary">
+      <h3>📊 Summary</h3>
+      <p>Total Surgeries This Month: <strong>{{ monthly_total }}</strong></p>
+      <p>Total Surgeries This Year: <strong>{{ yearly_total }}</strong></p>
+    </div>
+  </div>
+</body>
+</html>
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2, h3 {
+      color: #1976d2;
+      font-weight: 700;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Search Bar */
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: 1px solid #ced4da;
+      font-size: 1rem;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .search-bar input:focus {
+      border-color: #1976d2;
+      box-shadow: 0 0 6px rgba(25, 118, 210, 0.3);
+      outline: none;
+    }
+
+    .search-bar button {
+      padding: 10px 20px;
+      background-color: #1976d2;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .search-bar button:hover {
+      background-color: #115293;
+    }
+
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+      background: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: center;
+    }
+
+    thead {
+      background-color: #1976d2;
+      color: #fff;
+    }
+
+    tbody tr {
+      transition: background 0.2s ease;
+    }
+
+    tbody tr:hover {
+      background-color: rgba(25, 118, 210, 0.1);
+    }
+
+    a.details-btn {
+      display: inline-block;
+      padding: 5px 10px;
+      background-color: #17a2b8;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    a.details-btn:hover {
+      background-color: #117a8b;
+    }
+
+    /* Add Patient Button */
+    .add-btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: #fff;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover {
+      background-color: #1e7e34;
+    }
+
+    /* Summary Section */
+    .summary {
+      margin-top: 30px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .summary p {
+      margin: 5px 0;
+      font-weight: 500;
+    }
+
+    @media(max-width: 768px){
+      .search-bar {
+        flex-direction: column;
+      }
+
+      .search-bar button {
+        width: 100%;
+      }
+
+      th, td {
+        font-size: 0.85rem;
+        padding: 8px;
+      }
+    }
+  </style>

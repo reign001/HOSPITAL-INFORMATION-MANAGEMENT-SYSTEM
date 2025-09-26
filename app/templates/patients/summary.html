@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="yearly-summary-container">
+
+  <h2 class="summary-title">📊 Yearly Patient Summary</h2>
+
+  {% if summary %}
+  <div class="table-wrapper">
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Total Patients</th>
+          <th>View</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in summary %}
+        <tr>
+          <td>{{ row.year }}</td>
+          <td>{{ row.total }}</td>
+          <td>
+            <a href="{{ url_for('patients.patients_by_year', year=row.year) }}" class="btn view-btn">View</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="no-data-alert">
+    No yearly patient records found.
+  </div>
+  {% endif %}
+
+  <a href="{{ url_for('patients.list_patients') }}" class="btn back-btn">⬅ Back to Patient List</a>
+
+</div>
+
+<style>
+/* Container */
+.yearly-summary-container {
+  padding: 40px 20px;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  min-height: 100vh;
+}
+
+/* Title */
+.summary-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* Table Wrapper */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+/* Table Styling */
+.summary-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 500px;
+}
+
+.summary-table thead {
+  background-color: #0288d1;
+  color: #fff;
+  text-align: center;
+}
+
+.summary-table th,
+.summary-table td {
+  padding: 12px 15px;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.summary-table tbody tr {
+  background-color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.summary-table tbody tr:hover {
+  background-color: rgba(2,136,209,0.08);
+}
+
+/* View Button */
+.view-btn {
+  background-color: #17a2b8;
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.view-btn:hover {
+  background-color: #138496;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* No Data Alert */
+.no-data-alert {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Back Button */
+.back-btn {
+  display: inline-block;
+  background-color: #6c757d;
+  color: #fff;
+  padding: 10px 20px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .summary-table {
+    min-width: 100%;
+  }
+}
+</style>
+{% endblock %}

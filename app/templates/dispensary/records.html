@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="max-width:950px; margin:40px auto; padding:30px; font-family:Arial, sans-serif; background-color:#ffffff; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,0.08);">
+
+  <h2 style="text-align:center; color:#2c3e50; margin-bottom:30px;">📋 Dispensary Records - {{ period|capitalize }}</h2>
+
+  <!-- Summary -->
+  <div style="margin-bottom:25px; font-size:15px; color:#34495e; background-color:#f8f9fa; padding:15px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+      <p><b>Total Drugs Dispensed:</b> {{ summary.total_drugs_dispensed or 0 }}</p>
+      <p><b>Total Amount Paid:</b> <span style="color:green;">₦{{ "%.2f"|format(summary.total_amount_paid or 0) }}</span></p>
+      <p><b>Total Cost of Drugs Dispensed:</b> <span style="color:#e67e22;">₦{{ "%.2f"|format(summary.total_cost or 0) }}</span></p>
+  </div>
+
+  <!-- Records Table -->
+  <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse; font-size:14px; text-align:center;">
+      <thead>
+        <tr style="background-color:#ecf0f1; font-weight:bold; color:#2c3e50;">
+          <th style="border:1px solid #bdc3c7; padding:12px;">Patient</th>
+          <th style="border:1px solid #bdc3c7; padding:12px;">Drug</th>
+          <th style="border:1px solid #bdc3c7; padding:12px;">Quantity</th>
+          <th style="border:1px solid #bdc3c7; padding:12px;">Total Cost</th>
+          <th style="border:1px solid #bdc3c7; padding:12px;">Amount Paid</th>
+          <th style="border:1px solid #bdc3c7; padding:12px;">Balance</th>
+          <th style="border:1px solid #bdc3c7; padding:12px;">Dispensed At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if summary.records %}
+            {% for record in summary.records %}
+            <tr style="background-color:{% if loop.index is even %}#fafafa{% else %}#ffffff{% endif %};">
+              <td style="border:1px solid #ccc; padding:10px; font-weight:500;">
+                {{ record.patient.first_name }} {{ record.patient.surname }}
+              </td>
+              <td style="border:1px solid #ccc; padding:10px;">
+                {{ record.drug.name }} ({{ record.drug.brand_name }})
+              </td>
+              <td style="border:1px solid #ccc; padding:10px;">{{ record.quantity_dispensed }}</td>
+              <td style="border:1px solid #ccc; padding:10px; color:#e74c3c;">₦{{ "%.2f"|format(record.total_cost or 0) }}</td>
+              <td style="border:1px solid #ccc; padding:10px; color:green;">₦{{ "%.2f"|format(record.amount_paid or 0) }}</td>
+              <td style="border:1px solid #ccc; padding:10px; color:#c0392b;">₦{{ "%.2f"|format(record.balance or 0) }}</td>
+              <td style="border:1px solid #ccc; padding:10px;">
+                {{ record.dispensed_at.strftime("%Y-%m-%d %H:%M") if record.dispensed_at else '-' }}
+              </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+              <td colspan="7" style="padding:15px; color:#7f8c8d;">No dispensary records found for this period.</td>
+            </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width:700px; margin:40px auto; padding:30px; background:#ffffff; 
+            border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.08); font-family:'Roboto',sans-serif;">
+
+    <h2 style="font-weight:700; font-size:1.8rem; margin-bottom:25px; color:#1976d2; text-align:center;">
+        ✏️ Edit Outpatient Record
+    </h2>
+
+    <form method="POST" style="display:flex; flex-direction:column; gap:18px;">
+        {{ form.hidden_tag() }}
+
+        <!-- Patient Name -->
+        <div style="display:flex; flex-direction:column;">
+            {{ form.patient_name.label(style="font-weight:600; margin-bottom:5px; color:#333;") }}
+            {{ form.patient_name(class_="form-control", style="padding:10px 14px; border-radius:8px; border:1px solid #ced4da; transition:0.2s;") }}
+        </div>
+
+        <!-- Sex -->
+        <div style="display:flex; flex-direction:column;">
+            {{ form.sex.label(style="font-weight:600; margin-bottom:5px; color:#333;") }}
+            {{ form.sex(class_="form-select", style="padding:10px 14px; border-radius:8px; border:1px solid #ced4da; transition:0.2s;") }}
+        </div>
+
+        <!-- Age -->
+        <div style="display:flex; flex-direction:column;">
+            {{ form.age.label(style="font-weight:600; margin-bottom:5px; color:#333;") }}
+            {{ form.age(class_="form-control", style="padding:10px 14px; border-radius:8px; border:1px solid #ced4da; transition:0.2s;") }}
+        </div>
+
+        <!-- Address -->
+        <div style="display:flex; flex-direction:column;">
+            {{ form.address.label(style="font-weight:600; margin-bottom:5px; color:#333;") }}
+            {{ form.address(class_="form-control", style="padding:10px 14px; border-radius:8px; border:1px solid #ced4da; transition:0.2s;") }}
+        </div>
+
+        <!-- Medications Given -->
+        <div style="display:flex; flex-direction:column;">
+            {{ form.medications_given.label(style="font-weight:600; margin-bottom:5px; color:#333;") }}
+            {{ form.medications_given(class_="form-control", style="padding:10px 14px; border-radius:8px; border:1px solid #ced4da; transition:0.2s;") }}
+        </div>
+
+        <!-- NHIS Status -->
+        <div style="display:flex; flex-direction:column;">
+            {{ form.nhis_status.label(style="font-weight:600; margin-bottom:5px; color:#333;") }}
+            {{ form.nhis_status(class_="form-select", style="padding:10px 14px; border-radius:8px; border:1px solid #ced4da; transition:0.2s;") }}
+        </div>
+
+        <!-- Submit Button -->
+        <div style="text-align:center; margin-top:20px;">
+            {{ form.submit(class_="btn btn-primary", style="background: linear-gradient(135deg, #1976d2, #42a5f5); 
+                    color:#fff; padding:12px 25px; border-radius:10px; font-weight:600; font-size:1rem; 
+                    border:none; cursor:pointer; transition:0.3s;", 
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(0,0,0,0.2)';", 
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

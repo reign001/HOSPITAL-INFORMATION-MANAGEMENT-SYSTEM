@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5" style="text-align:center; margin:auto; padding:auto;">
+
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-primary page-title">🏥 In-Patient Records</h2>
+        <p class="text-muted">Efficiently manage and monitor in-patient admissions</p>
+        <hr class="section-divider">
+    </div>
+
+    <!-- Add/Edit Patient Form -->
+    <div class="d-flex justify-content-center mb-5" style="text-align:center; margin:auto; height: 400px;">
+        <form method="POST" class="card shadow-lg border-0 rounded-4 p-5 form-card w-100">
+            {{ form.hidden_tag() }}
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    {{ form.hospital_number.label(class="form-label fw-semibold text-muted") }}
+                    {{ form.hospital_number(class="form-control form-control-lg form-input", id="hospital_number") }}
+                </div>
+                {{ form.patient_id(hidden=True, id="patient_id") }}
+                <div class="col-md-4">
+                    {{ form.patient_name.label(class="form-label fw-semibold text-muted") }}
+                    {{ form.patient_name(class="form-control form-control-lg form-input", id="patient_name") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.sex.label(class="form-label fw-semibold text-muted") }}
+                    {{ form.sex(class="form-select form-select-lg form-input", id="sex") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.age.label(class="form-label fw-semibold text-muted") }}
+                    {{ form.age(class="form-control form-control-lg form-input", id="age") }}
+                </div>
+            </div>
+
+            <div class="row g-4 mt-2">
+                <div class="col-md-4">
+                    {{ form.diagnosis.label(class="form-label fw-semibold text-muted") }}
+                    {{ form.diagnosis(class="form-control form-control-lg form-input") }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.medications_given.label(class="form-label fw-semibold text-muted") }}
+                    {{ form.medications_given(class="form-control form-control-lg form-input") }}
+                </div>
+                <div class="col-md-4">
+                    {{ form.condition.label(class="form-label fw-semibold text-muted") }}
+                    {{ form.condition(class="form-control form-control-lg form-input") }}
+                </div>
+            </div>
+
+            <div class="row g-4 mt-2">
+                <div class="col-md-6">
+                    {{ form.admitted_on.label(class="form-label fw-semibold text-muted") }}
+                    {{ form.admitted_on(class="form-control form-control-lg form-input") }}
+                </div>
+                <div class="col-md-6">
+                    {{ form.discharged_at.label(class="form-label fw-semibold text-muted") }}
+                    {{ form.discharged_at(class="form-control form-control-lg form-input") }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-save w-100 mt-4">
+                💾 {{ form.submit.label.text or "Save Record" }}
+            </button>
+        </form>
+    </div>
+
+    <!-- Search Input -->
+    <div class="d-flex-2 justify-content-center mb-4">
+        <div class="input-group" style="max-width: 600px;">
+            <input type="text" id="search_query" name="q" value="{{ search_query }}" 
+                placeholder="🔍 Search patient..."
+                class="form-control form-control-lg shadow-sm">
+            <button type="button" class="btn btn-primary px-4" onclick="runSearch()">
+                Search
+            </button>
+        </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="d-flex justify-content-center gap-3 flex-wrap mb-4" id="badge-holder">
+        <span class="badge stats-badge bg-info">
+            📊 Monthly Total ({{ now.strftime("%B %Y") }}): {{ monthly_total }}
+        </span>
+        <span class="badge stats-badge bg-secondary">
+            📈 Yearly Total ({{ now.strftime("%Y") }}): {{ yearly_total }}
+        </span>
+    </div>
+
+    <!-- Table -->
+    <div class="d-flex" style="justify-content-center">
+        <div class="table-responsive shadow-lg rounded table-container">
+            <table class="table table-striped table-bordered align-middle mb-0">
+                <thead class="table-header">
+                    <tr>
+                        <th>Hospital No</th>
+                        <th>Name</th>
+                        <th>Sex</th>
+                        <th>Age</th>
+                        <th>Diagnosis</th>
+                        <th>Medications</th>
+                        <th>Condition</th>
+                        <th>Admitted</th>
+                        <th>Discharged</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in inpatients %}
+                    <tr>
+                        <td class="fw-semibold">{{ p.hospital_number }}</td>
+                        <td>{{ p.patient_name }}</td>
+                        <td>{{ p.sex }}</td>
+                        <td>{{ p.age }}</td>
+                        <td>{{ p.diagnosis }}</td>
+                        <td>{{ p.medications_given }}</td>
+                        <td>{{ p.condition }}</td>
+                        <td>{{ p.admitted_at.strftime("%Y-%m-%d") }}</td>
+                        <td>
+                            {% if p.discharged_at %}
+                                {{ p.discharged_at.strftime("%Y-%m-%d") }}
+                            {% else %}
+                                <span class="text-warning">Still Admitted</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if p.discharge %}
+                                <span class="badge bg-success">Discharged</span>
+                            {% elif p.rip %}
+                                <span class="badge bg-danger">RIP</span>
+                            {% elif p.referred %}
+                                <span class="badge bg-info text-dark">Referred</span>
+                            {% else %}
+                                <span class="badge bg-primary text-dark">Ongoing</span>
+                            {% endif %}
+                        </td>
+                        <td class="d-flex gap-2 justify-content-center flex-wrap">
+                            <a href="{{ url_for('inpatient.inpatient_detail', patient_id=p.id) }}" 
+                               class="btn btn-action btn-info">Details</a>
+                            <a href="{{ url_for('inpatient.edit_inpatient', patient_id=p.id) }}" 
+                               class="btn btn-action btn-warning">Edit</a>
+                            <form action="{{ url_for('inpatient.delete_inpatient', patient_id=p.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-action btn-danger"
+                                        onclick="return confirm('Delete this record?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="11" class="text-center text-muted py-4">No records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- New Styling -->
+<style>
+    body {
+        background-color: #f4f9fb;
+    }
+    .page-title {
+        letter-spacing: 1px;
+    }
+    .section-divider {
+        width: 120px;
+        border: 2px solid #17a2b8;
+        opacity: 0.9;
+        margin: auto;
+    }
+    .form-card {
+        max-width: 950px;
+        background: #fff;
+        border: 1px solid #e3f2fd;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 430px;
+        margin-left: 200px;
+    
+    }
+    .form-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+        
+    }
+    .form-input {
+        border-radius: 4px;
+        border: 1px solid #d0e3f0;
+        transition: all 0.3s ease;
+        margin-top: 6px;
+        height: 30px;
+        width: 400px;
+    }
+    .form-input:focus {
+        border-color: #17a2b8;
+        box-shadow: 0 0 10px rgba(23,162,184,0.25);
+    }
+    .btn-save {
+        padding: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        background: #28a745;
+        border: none;
+        color: #fff;
+        transition: background 0.3s;
+        margin-top: 10px;
+    }
+    .btn-save:hover {
+        background: #218838;
+    }
+    .stats-badge {
+        font-size: 1rem;
+        padding: 10px 20px;
+        border-radius: 50px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .table-container {
+        max-width: 1200px;
+    }
+    .d-flex{
+        margin-left: 100px;
+        margin-top: 40px;
+    }
+    .d-flex-2{
+        background-color: grey;
+        height: 50px;
+        width: 800px;
+        margin-left: 300px;
+        margin-top: 50px;
+        justify-content: space-inbetween;
+        padding-top: 15px;
+    }
+    .table-header {
+        background: #e9f7ef;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .table-bordered th, .table-bordered td {
+        border: 1px solid #dee2e6 !important;
+    }
+    .btn-action {
+        font-weight: 500;
+        border: 1px solid grey;
+        padding: 6px 16px;
+        border-radius: 50px;
+        transition: transform 0.2s ease;
+        text-decoration: none;
+        color: white;
+        background: #28a745;
+    }
+    a {
+        font-weight: 500;
+        border: 1px solid grey;
+        padding: 6px 16px;
+        border-radius: 50px;
+        transition: transform 0.2s ease;
+        color: white;
+        background: #28a745;
+    }
+    .btn-action:hover {
+        transform: translateY(-2px);
+        color: red;
+    }
+
+    a:hover {
+        transform: translateY(-2px);
+    }
+    #badge-holder{
+        background-color: grey;
+        height: 50px;
+        width: 800px;
+        margin-left: 300px;
+        justify-content: space-inbetween;
+        padding-top: 30px;
+    }
+</style>
+
+<script>
+function runSearch() {
+    let query = document.getElementById("search_query").value.trim();
+    if (!query) {
+        alert("Please enter a hospital number or patient name");
+        return;
+    }
+
+    fetch(`/inpatients/lookup_patient?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (!data.error) {
+                // Autofill form fields with returned data
+                document.getElementById("patient_id").value = data.id;
+                document.getElementById("hospital_number").value = data.hospital_number || "";
+                document.getElementById("patient_name").value = data.name || "";
+                document.getElementById("sex").value = data.sex || "";
+                document.getElementById("age").value = data.age || "";
+            } else {
+                alert("❌ " + data.error);
+            }
+        })
+        .catch(err => console.error("Error:", err));
+}
+</script>
+{% endblock %}
