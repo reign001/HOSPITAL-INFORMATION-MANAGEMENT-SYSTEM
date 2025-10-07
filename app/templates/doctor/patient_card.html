@@ -1,0 +1,6 @@
+<!-- templates/doctor/patient_card.html -->
+<h3>Patient Card - {{ patient.full_name() }}</h3>
+<form method="post">
+  <textarea name="notes" rows="10" cols="80">{{ card.notes if card else "" }}</textarea><br>
+  <button type="submit">Save</button>
+</form>

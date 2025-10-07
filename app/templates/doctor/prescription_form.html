@@ -1,0 +1,6 @@
+<!-- templates/doctor/prescription_form.html -->
+<h3>Prescription for {{ patient.full_name() }}</h3>
+<form method="post">
+  <textarea name="drugs" rows="6" cols="60" placeholder="Enter drug prescriptions"></textarea><br>
+  <button type="submit">Submit</button>
+</form>

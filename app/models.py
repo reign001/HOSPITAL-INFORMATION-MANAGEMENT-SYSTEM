@@ -25,6 +25,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy import Enum as SAEnum
 from app import db, login_manager
 from sqlalchemy import extract
+from flask_login import UserMixin
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -129,6 +130,45 @@ class Patient(db.Model):
     @staticmethod
     def patients_by_year(year):
         return Patient.query.filter(extract("year", Patient.created_at) == year).all()
+    
+
+# Doctor/User model assumed to exist, adjust accordingly
+
+class PatientCard(db.Model):
+    __tablename__ = "patient_cards"
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey("patients.id"), nullable=False, unique=True)
+    notes = db.Column(db.Text)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    patient = db.relationship("Patient", backref=db.backref("card", uselist=False))
+
+
+class Prescription(db.Model):
+    __tablename__ = "prescriptions"
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey("patients.id"), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    drugs = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_dispensed = db.Column(db.Boolean, default=False)
+
+    patient = db.relationship("Patient", backref="prescriptions")
+    doctor = db.relationship("User", backref="prescriptions")
+
+
+class LabRequest(db.Model):
+    __tablename__ = "lab_requests"
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey("patients.id"), nullable=False)
+    doctor_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    tests_requested = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_completed = db.Column(db.Boolean, default=False)
+
+    patient = db.relationship("Patient", backref="lab_requests")
+    doctor = db.relationship("User", backref="lab_requests")
+
 
 
 class OperationDiary(db.Model):

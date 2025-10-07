@@ -1,0 +1,6 @@
+<!-- templates/doctor/lab_request_form.html -->
+<h3>Lab Request for {{ patient.full_name() }}</h3>
+<form method="post">
+  <textarea name="tests" rows="6" cols="60" placeholder="Enter requested tests"></textarea><br>
+  <button type="submit">Submit</button>
+</form>

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from datetime import datetime
 from sqlalchemy import func
 from app import db
-from app.models import LabVisit
+from app.models import LabVisit, LabRequest
 from app.forms import LabVisitForm
 from decorators import role_required
 
@@ -79,3 +79,8 @@ def delete_lab_visit(visit_id):
     db.session.commit()
     flash("Lab visit deleted successfully!", "danger")
     return redirect(url_for("lab.lab_index"))
+
+@lab_bp.route("/laboratory")
+def laboratory_view():
+    requests = LabRequest.query.filter_by(is_completed=False).all()
+    return render_template("lab/requests.html", requests=requests)

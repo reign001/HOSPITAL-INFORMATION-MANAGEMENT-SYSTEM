@@ -109,130 +109,118 @@ def dispense_drug():
 
 from sqlalchemy.orm import joinedload
 
-from datetime import datetime, timedelta, date
-
-
 # def get_dispense_summary(period="day"):
 #     now = datetime.utcnow()
 
-
-
-#     if period == "day":
-#         today = date.today()
-#         start = datetime(today.year, today.month, today.day, 0, 0, 0)
-#         end = datetime(today.year, today.month, today.day, 23, 59, 59)
-#         query = query.filter(DispenseRecord.dispensed_at >= start,
-#                             DispenseRecord.dispensed_at <= end)
-#     elif period == "week":
-#         start = now - timedelta(days=now.weekday())
-#     elif period == "month":
-#         start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-#     else:
-#         start = None
-
+#     # Start with the base query
 #     query = DispenseRecord.query.options(
 #         joinedload(DispenseRecord.patient),
 #         joinedload(DispenseRecord.drug)
-#     )
+#     ).all()
 
-#     if start:
-#         query = query.filter(DispenseRecord.dispensed_at >= start)
+#     if period == "day":
+#         today = date.today()
+#         query = query.filter(func.date(DispenseRecord.dispensed_at) == today)
+#     elif period == "week":
+#         start_of_week = now - timedelta(days=now.weekday())
+#         query = query.filter(DispenseRecord.dispensed_at >= start_of_week)
+#     elif period == "month":
+#         start_of_month = datetime(now.year, now.month, 1)
+#         query = query.filter(DispenseRecord.dispensed_at >= start_of_month)
 
 #     # Totals
-#     total_drugs_dispensed = db.session.query(
-#         func.sum(DispenseRecord.quantity_dispensed)
-#     ).filter(DispenseRecord.dispensed_at >= start).scalar() or 0
-
-#     total_amount_paid = db.session.query(
-#         func.sum(DispenseRecord.amount_paid)
-#     ).filter(DispenseRecord.dispensed_at >= start).scalar() or 0
-
-#     total_cost = db.session.query(
-#         func.sum(DispenseRecord.total_cost)
-#     ).filter(DispenseRecord.dispensed_at >= start).scalar() or 0
+#     records = query.all()
+#     total_drugs_dispensed = sum(r.quantity_dispensed for r in records)
+#     total_amount_paid = sum(r.amount_paid or 0 for r in records)
+#     total_cost = sum(r.total_cost or 0 for r in records)
 
 #     return {
 #         "total_drugs_dispensed": total_drugs_dispensed,
 #         "total_amount_paid": total_amount_paid,
 #         "total_cost": total_cost,
-#         "records": query.all()
+#         "records": records
 #     }
 
-
-
-
-
-def get_dispense_summary(period="day"):
+def get_dispense_summary(period="day", year=None, month=None):
     now = datetime.utcnow()
-
-    # Start with the base query
-    query = DispenseRecord.query.options(
-        joinedload(DispenseRecord.patient),
-        joinedload(DispenseRecord.drug)
-    ).all()
-
-    if period == "day":
-        today = date.today()
-        query = query.filter(func.date(DispenseRecord.dispensed_at) == today)
-    elif period == "week":
-        start_of_week = now - timedelta(days=now.weekday())
-        query = query.filter(DispenseRecord.dispensed_at >= start_of_week)
-    elif period == "month":
-        start_of_month = datetime(now.year, now.month, 1)
-        query = query.filter(DispenseRecord.dispensed_at >= start_of_month)
-
-    # Totals
-    records = query.all()
-    total_drugs_dispensed = sum(r.quantity_dispensed for r in records)
-    total_amount_paid = sum(r.amount_paid or 0 for r in records)
-    total_cost = sum(r.total_cost or 0 for r in records)
-
-    return {
-        "total_drugs_dispensed": total_drugs_dispensed,
-        "total_amount_paid": total_amount_paid,
-        "total_cost": total_cost,
-        "records": records
-    }
-
-def get_dispense_summary(period="day"):
-    now = datetime.utcnow()
-
     query = DispenseRecord.query
 
     if period == "day":
         today = date.today()
         query = query.filter(func.date(DispenseRecord.dispensed_at) == today)
+
     elif period == "week":
         start_of_week = now - timedelta(days=now.weekday())
         query = query.filter(DispenseRecord.dispensed_at >= start_of_week)
+
     elif period == "month":
+        # default to current month
         start_of_month = datetime(now.year, now.month, 1)
         query = query.filter(DispenseRecord.dispensed_at >= start_of_month)
 
-    total_drugs_dispensed = sum(r.quantity_dispensed for r in query.all())
-    total_amount_paid = sum(r.amount_paid or 0 for r in query.all())
-    total_cost = sum(r.total_cost or 0 for r in query.all())
+    elif period == "specific_month" and year and month:
+        start_of_month = datetime(year, month, 1)
+        if month == 12:
+            end_of_month = datetime(year + 1, 1, 1)
+        else:
+            end_of_month = datetime(year, month + 1, 1)
+        query = query.filter(
+            DispenseRecord.dispensed_at >= start_of_month,
+            DispenseRecord.dispensed_at < end_of_month
+        )
 
-    patients = (
-        db.session.query(DispenseRecord.patient_id, func.count())
-        .filter(query.whereclause)
-        .group_by(DispenseRecord.patient_id)
-        .all()
-    )
+    records = query.all()
 
     return {
-        "total_drugs_dispensed": total_drugs_dispensed,
-        "total_amount_paid": total_amount_paid,
-        "total_cost": total_cost,
-        "patients": patients,
-        "records": query.all(),
+        "total_drugs_dispensed": sum(r.quantity_dispensed for r in records),
+        "total_amount_paid": sum(r.amount_paid or 0 for r in records),
+        "total_cost": sum(r.total_cost or 0 for r in records),
+        "records": records,
     }
 
 
 
 
 @dispensary_bp.route("/records/<string:period>")
-def dispensary_records(period):
-    summary = get_dispense_summary(period)
-    return render_template("dispensary/records.html", summary=summary, period=period)
+@dispensary_bp.route("/records/<string:period>/<int:year>/<int:month>")
+def dispensary_records(period, year=None, month=None):
+    summary = get_dispense_summary(period, year, month)
+    months = get_available_months()  # NEW
+    
+    return render_template(
+        "dispensary/records.html",
+        summary=summary,
+        period=period,
+        year=year,
+        month=month,
+        months=months
+    )
+import calendar
+def get_available_months():
+    results = (
+        db.session.query(
+            func.extract('year', DispenseRecord.dispensed_at).label("year"),
+            func.extract('month', DispenseRecord.dispensed_at).label("month")
+        )
+        .group_by("year", "month")
+        .order_by("year", "month")
+        .all()
+    )
+
+    months = []
+    for r in results:
+        year = int(r.year)
+        month_num = int(r.month)
+        month_name = calendar.month_name[month_num]  # e.g. 9 -> "September"
+        months.append((year, month_num, month_name))
+    return months
+
+
+@dispensary_bp.route("/dispensary")
+@login_required
+def dispensary_view():
+    prescriptions = Prescription.query.filter_by(is_dispensed=False).all()
+    return render_template("dispensary/prescriptions.html", prescriptions=prescriptions)
+
+
 

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor's Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h2 {
+      text-align: center;
+      color: #004d80;
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .search-box input[type="text"] {
+      padding: 10px;
+      width: 60%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    .search-box button {
+      padding: 10px 16px;
+      margin-left: 5px;
+      background: #0073b1;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .search-box button:hover {
+      background: #005f8a;
+    }
+
+    .patient-folder {
+      background: #fff;
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .patient-folder:hover {
+      transform: translateY(-3px);
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .patient-folder h3 {
+      margin: 0 0 10px;
+      color: #0073b1;
+    }
+
+    .patient-folder p {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .patient-actions a {
+      text-decoration: none;
+      margin-right: 15px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #fff;
+      transition: background 0.3s;
+    }
+
+    .patient-actions a:nth-child(1) {
+      background: #6c63ff; /* Patient Card */
+    }
+
+    .patient-actions a:nth-child(1):hover {
+      background: #5851db;
+    }
+
+    .patient-actions a:nth-child(2) {
+      background: #ff6b6b; /* Prescription */
+    }
+
+    .patient-actions a:nth-child(2):hover {
+      background: #e63946;
+    }
+
+    .patient-actions a:nth-child(3) {
+      background: #00b894; /* Lab Request */
+    }
+
+    .patient-actions a:nth-child(3):hover {
+      background: #009874;
+    }
+
+    .no-patients {
+      text-align: center;
+      font-size: 16px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Doctor’s Dashboard</h2>
+
+  <!-- Search Bar -->
+  <div class="search-box">
+    <form method="get" action="{{ url_for('doctor.dashboard') }}">
+      <input type="text" name="q" placeholder="Search patients by name or hospital number..." value="{{ query or '' }}">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <!-- Patients -->
+  {% for patient in patients %}
+    <div class="patient-folder">
+      <h3>{{ patient.full_name() }} (HN: {{ patient.hospital_number }})</h3>
+      <p>Age: {{ patient.age }} | Sex: {{ patient.sex.value }} | Phone: {{ patient.phone_number }}</p>
+
+      <div class="patient-actions">
+        <a href="{{ url_for('doctor.update_patient_card', patient_id=patient.id) }}">🗂 Patient Card</a>
+        <a href="{{ url_for('doctor.create_prescription', patient_id=patient.id) }}">💊 Prescription</a>
+        <a href="{{ url_for('doctor.create_lab_request', patient_id=patient.id) }}">🧪 Lab Request</a>
+      </div>
+    </div>
+  {% else %}
+    <p class="no-patients">No patients found.</p>
+  {% endfor %}
+
+</body>
+</html>

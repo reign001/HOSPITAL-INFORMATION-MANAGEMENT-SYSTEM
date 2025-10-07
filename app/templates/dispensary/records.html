@@ -50,6 +50,26 @@
               <td colspan="7" style="padding:15px; color:#7f8c8d;">No dispensary records found for this period.</td>
             </tr>
         {% endif %}
+        <h2 style="text-align:center; color:#2c3e50; margin-bottom:30px;">
+        📋 Dispensary Records - 
+        {% if period == "specific_month" %}
+          {{ month }}/{{ year }}
+        {% else %}
+          {{ period|capitalize }}
+        {% endif %}
+      </h2>
+      <div style="text-align:center; margin-bottom:20px;">
+      <label for="month-select"><b>View Records By Month:</b></label>
+      <select id="month-select" onchange="if(this.value) window.location=this.value" style="padding:6px; border-radius:5px; border:1px solid #ccc;">
+          <option value="">-- Select Month --</option>
+          {% for y, m, mname in months %}
+            <option value="{{ url_for('dispensary.dispensary_records', period='specific_month', year=y, month=m) }}"
+              {% if year==y and month==m %}selected{% endif %}>
+              {{ mname }} {{ y }}
+            </option>
+          {% endfor %}
+      </select>
+    </div>
       </tbody>
     </table>
   </div>
