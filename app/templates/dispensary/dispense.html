@@ -1,95 +1,459 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container py-5">
 
-    <form method="post" style="max-width:800px; margin:40px auto; padding:40px; border-radius:14px; background-color:#ffffff; box-shadow:0 12px 30px rgba(0,0,0,0.1); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+<style>
+  /* Base & Reset */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-        <h2 class="text-center mb-5" style="color:#2c3e50; font-weight:700; letter-spacing:1px;">💊 Dispense Drugs</h2>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5faff 0%, #e6f4fc 100%);
+    color: #2c3e50;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
 
-        <!-- Patient Information -->
-        <div class="mb-5">
-            <h5 class="mb-3" style="color:#34495e; font-weight:600;">Patient Information</h5>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <input type="text" name="patient_name" placeholder="First Name" value="{{ record.patient_name if record else '' }}" class="form-control shadow-sm" required>
-                </div>
-                <div class="col-md-4">
-                    <input type="text" name="middle_name" placeholder="Middle Name" value="{{ record.middle_name if record else '' }}" class="form-control shadow-sm">
-                </div>
-                <div class="col-md-4">
-                    <input type="text" name="surname" placeholder="Surname" value="{{ record.surname if record else '' }}" class="form-control shadow-sm" required>
-                </div>
-                <div class="col-md-3">
-                    <input type="number" name="patient_age" placeholder="Age" value="{{ record.patient_age if record else '' }}" class="form-control shadow-sm">
-                </div>
-                <div class="col-md-3">
-                    <input type="text" name="hospital_number" placeholder="Hospital Number" value="{{ record.hospital_number if record else '' }}" class="form-control shadow-sm" required>
-                </div>
-                <div class="col-md-3">
-                    <select name="sex" class="form-select shadow-sm" required>
-                        <option value="">--Select Sex--</option>
-                        <option value="Male" {% if record and record.sex=='Male' %}selected{% endif %}>Male</option>
-                        <option value="Female" {% if record and record.sex=='Female' %}selected{% endif %}>Female</option>
-                        <option value="Other" {% if record and record.sex=='Other' %}selected{% endif %}>Other</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <input type="text" name="phone_number" placeholder="Phone Number" value="{{ record.phone_number if record else '' }}" class="form-control shadow-sm">
-                </div>
-                <div class="col-md-6">
-                    <input type="text" name="address" placeholder="Address" value="{{ record.address if record else '' }}" class="form-control shadow-sm">
-                </div>
-                <div class="col-md-6">
-                    <select name="nhis_status" class="form-select shadow-sm">
-                        <option value="NON_NHIS" {% if record and record.nhis_status=='NON_NHIS' %}selected{% endif %}>NON_NHIS</option>
-                        <option value="NHIS" {% if record and record.nhis_status=='NHIS' %}selected{% endif %}>NHIS</option>
-                    </select>
-                </div>
-            </div>
+  /* Main Container */
+  .dispense-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* Form Card */
+  .dispense-form {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .form-title {
+    font-size: 2.1rem;
+    color: #1565c0;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+  }
+
+  /* Section Headers */
+  .section-header {
+    font-size: 1.35rem;
+    color: #1e88e5;
+    font-weight: 600;
+    margin: 2rem 0 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e3f2fd;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Patient Info Grid */
+  .patient-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group {
+    position: relative;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 0.95rem 1.1rem;
+    border: 1.8px solid #bbdefb;
+    border-radius: 12px;
+    font-size: 1rem;
+    background-color: #fafcff;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #1e88e5;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(30, 136, 229, 0.18);
+  }
+
+  .form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c757d'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+  }
+
+  /* Drugs Section */
+  .drugs-container {
+    background: #f8fbff;
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1.5px dashed #90caf9;
+  }
+
+  .drug-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    transition: all 0.3s ease;
+  }
+
+  .drug-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(30, 136, 229, 0.15);
+  }
+
+  .drug-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .drug-check {
+    width: 1.3rem;
+    height: 1.3rem;
+    accent-color: #1e88e5;
+    cursor: pointer;
+  }
+
+  .drug-name {
+    font-weight: 600;
+    color: #1565c0;
+  }
+
+  .drug-price {
+    color: #1976d2;
+    font-weight: 600;
+  }
+
+  .qty-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 140px;
+  }
+
+  .qty-label {
+    font-size: 0.9rem;
+    color: #546e7a;
+    font-weight: 500;
+  }
+
+  .qty-input {
+    width: 80px;
+    padding: 0.5rem 0.7rem;
+    border: 1.8px solid #bbdefb;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    text-align: center;
+    background-color: #fafcff;
+  }
+
+  .qty-input:focus {
+    outline: none;
+    border-color: #1e88e5;
+    box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.15);
+  }
+
+  /* Totals Section */
+  .totals-section {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    text-align: center;
+  }
+
+  .amount-paid-group {
+    max-width: 300px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .amount-paid-group label {
+    font-weight: 600;
+    color: #1565c0;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .totals-display {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .total-item {
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+
+  .total-label {
+    color: #546e7a;
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .total-value {
+    font-size: 1.4rem;
+  }
+
+  .text-success { color: #2e7d32; }
+  .text-danger { color: #c62828; }
+
+  /* Submit Button */
+  .submit-btn {
+    background: linear-gradient(135deg, #1e88e5, #1565c0);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 14px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(30, 136, 229, 0.3);
+  }
+
+  .submit-btn:hover {
+    background: linear-gradient(135deg, #1565c0, #0d47a1);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(30, 136, 229, 0.4);
+  }
+
+  /* Record Links */
+  .record-links {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .record-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background: white;
+    color: #1e88e5;
+    border: 2px solid #90caf9;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(30, 136, 229, 0.12);
+  }
+
+  .record-btn:hover {
+    background: #e3f2fd;
+    border-color: #42a5f5;
+    color: #0d47a1;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(30, 136, 229, 0.2);
+  }
+
+  /* Empty State */
+  .empty-drugs {
+    text-align: center;
+    color: #90a4ae;
+    font-style: italic;
+    padding: 2rem;
+    background: #f8fbff;
+    border-radius: 12px;
+    border: 1.5px dashed #bbdefb;
+  }
+
+  /* Responsive Design */
+  @media (min-width: 640px) {
+    .patient-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .dispense-container {
+      padding: 0 2rem;
+    }
+
+    .dispense-form {
+      padding: 3rem;
+    }
+
+    .patient-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .drug-item {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .qty-group {
+      max-width: 160px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .patient-grid {
+      gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .form-title {
+      font-size: 1.8rem;
+    }
+
+    .section-header {
+      font-size: 1.2rem;
+    }
+
+    .record-links {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .record-btn {
+      width: 100%;
+      max-width: 280px;
+      justify-content: center;
+    }
+  }
+
+  /* Print Styles */
+  @media print {
+    body { background: white; }
+    .dispense-form { box-shadow: none; border: 1px solid #ddd; }
+    .submit-btn, .record-links { display: none; }
+  }
+</style>
+
+<div class="dispense-container">
+  <form method="post" class="dispense-form">
+    <h2 class="form-title">Dispense Drugs</h2>
+
+    <!-- Patient Information -->
+    <div class="section-header">Patient Information</div>
+    <div class="patient-grid">
+      <div class="form-group">
+        <input type="text" name="patient_name" placeholder="First Name" value="{{ record.patient_name if record else '' }}" required>
+      </div>
+      <div class="form-group">
+        <input type="text" name="middle_name" placeholder="Middle Name" value="{{ record.middle_name if record else '' }}">
+      </div>
+      <div class="form-group">
+        <input type="text" name="surname" placeholder="Surname" value="{{ record.surname if record else '' }}" required>
+      </div>
+      <div class="form-group">
+        <input type="number" name="patient_age" placeholder="Age" value="{{ record.patient_age if record else '' }}">
+      </div>
+      <div class="form-group">
+        <input type="text" name="hospital_number" placeholder="Hospital Number" value="{{ record.hospital_number if record else '' }}" required>
+      </div>
+      <div class="form-group">
+        <select name="sex" required>
+          <option value="">--Select Sex--</option>
+          <option value="Male" {% if record and record.sex=='Male' %}selected{% endif %}>Male</option>
+          <option value="Female" {% if record and record.sex=='Female' %}selected{% endif %}>Female</option>
+          <option value="Other" {% if record and record.sex=='Other' %}selected{% endif %}>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input type="text" name="phone_number" placeholder="Phone Number" value="{{ record.phone_number if record else '' }}">
+      </div>
+      <div class="form-group">
+        <input type="text" name="address" placeholder="Address" value="{{ record.address if record else '' }}">
+      </div>
+      <div class="form-group">
+        <select name="nhis_status">
+          <option value="NON_NHIS" {% if record and record.nhis_status=='NON_NHIS' %}selected{% endif %}>NON_NHIS</option>
+          <option value="NHIS" {% if record and record.nhis_status=='NHIS' %}selected{% endif %}>NHIS</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Drugs Section -->
+    <div class="section-header">Select Drugs</div>
+    <div class="drugs-container">
+      {% if drugs %}
+        {% for drug in drugs %}
+        <div class="drug-item">
+          <div class="drug-header">
+            <input type="checkbox" name="drug_ids[]" value="{{ drug.id }}" class="drug-check" data-price="{{ drug.unit_selling_price }}">
+            <span class="drug-name">{{ drug.name }}</span>
+            <span>({{ drug.brand_name }})</span>
+            <span class="drug-price">₦{{ "%.2f"|format(drug.unit_selling_price) }}</span>
+          </div>
+          <div class="qty-group">
+            <span class="qty-label">Qty:</span>
+            <input type="number" name="qty_{{ drug.id }}" value="0" min="0" class="qty-input" data-id="{{ drug.id }}">
+          </div>
         </div>
+        {% endfor %}
+      {% else %}
+        <p class="empty-drugs">No drugs available</p>
+      {% endif %}
+    </div>
 
-        <!-- Drugs Section -->
-        <h5 class="mb-3" style="color:#34495e; font-weight:600;">Select Drugs</h5>
-        <div class="mb-5">
-            {% if drugs %}
-                {% for drug in drugs %}
-                <div class="p-3 mb-2 border rounded d-flex align-items-center justify-content-between bg-light shadow-sm drug-row">
-                    <div>
-                        <input type="checkbox" name="drug_ids[]" value="{{ drug.id }}" class="drug-check me-2" data-price="{{ drug.unit_selling_price }}">
-                        <strong>{{ drug.name }}</strong> ({{ drug.brand_name }}) - <span class="text-primary">₦{{ "%.2f"|format(drug.unit_selling_price) }}</span>
-                    </div>
-                    <div>
-                        Qty: <input type="number" name="qty_{{ drug.id }}" value="0" min="0" class="qty-input shadow-sm" data-id="{{ drug.id }}">
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-muted">No drugs available</p>
-            {% endif %}
+    <!-- Amount Paid & Totals -->
+    <div class="totals-section">
+      <div class="amount-paid-group">
+        <label>Amount Paid</label>
+        <input type="number" step="0.01" name="amount_paid" value="{{ record.amount_paid if record else '' }}" class="form-control">
+      </div>
+
+      <div class="totals-display">
+        <div class="total-item">
+          <span class="total-label">Total Amount</span>
+          <span class="total-value text-success">₦<span id="totalAmount">{{ record.total_amount if record else '0.00' }}</span></span>
         </div>
-
-        <!-- Amount Paid & Totals -->
-        <div class="mb-5">
-            <label class="form-label fw-bold" style="color:#34495e;">Amount Paid</label>
-            <input type="number" step="0.01" name="amount_paid" value="{{ record.amount_paid if record else '' }}" class="form-control shadow-sm">
-
-            <div class="mt-3 totals">
-                <p class="mb-1 fw-bold">Total Amount: <span class="text-success">₦<span id="totalAmount">{{ record.total_amount if record else '0.00' }}</span></span></p>
-                <p class="mb-1 fw-bold">Balance: <span class="text-danger">₦<span id="balance">{{ record.balance if record else '0.00' }}</span></span></p>
-            </div>
+        <div class="total-item">
+          <span class="total-label">Balance</span>
+          <span class="total-value text-danger">₦<span id="balance">{{ record.balance if record else '0.00' }}</span></span>
         </div>
+      </div>
+    </div>
 
-        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">💊 Dispense</button>
+    <button type="submit" class="submit-btn">Dispense</button>
 
-        <!-- Records Links -->
-         <br><br>
-         <br><br>
-        <div class="mt-5 d-flex flex-wrap gap-3 justify-content-center record-links">
-            <a href="{{ url_for('dispensary.dispensary_records', period='day') }}" class="record-btn">📅 Daily Records</a>
-            <a href="{{ url_for('dispensary.dispensary_records', period='week') }}" class="record-btn">🗓️ Weekly Records</a>
-            <a href="{{ url_for('dispensary.dispensary_records', period='month') }}" class="record-btn">📆 Monthly Records</a>
-        </div>
-    </form>
+    <!-- Records Links -->
+    <div class="record-links">
+      <a href="{{ url_for('dispensary.dispensary_records', period='day') }}" class="record-btn">Daily Records</a>
+      <a href="{{ url_for('dispensary.dispensary_records', period='week') }}" class="record-btn">Weekly Records</a>
+      <a href="{{ url_for('dispensary.dispensary_records', period='month') }}" class="record-btn">Monthly Records</a>
+    </div>
+  </form>
 </div>
 
 <script>
@@ -104,60 +468,13 @@ document.addEventListener("input", function () {
     document.getElementById("totalAmount").textContent = total.toFixed(2);
 
     const amountPaid = parseFloat(document.querySelector('[name="amount_paid"]').value) || 0;
-    document.getElementById("balance").textContent = (total - amountPaid).toFixed(2);
+    const balance = total - amountPaid;
+    document.getElementById("balance").textContent = balance.toFixed(2);
+    
+    // Visual feedback for balance
+    const balanceEl = document.getElementById("balance");
+    balanceEl.parentElement.className = balance >= 0 ? "total-value text-success" : "total-value text-danger";
 });
 </script>
 
-<style>
-/* Professional classy form styles */
-form input, form select {
-    transition: all 0.3s;
-    border-radius: 6px;
-    padding: 10px;
-}
-form input:focus, form select:focus {
-    box-shadow: 0 0 10px rgba(52, 152, 219, 0.4);
-    border-color: #3498db;
-}
-.drug-check {
-    transform: scale(1.1);
-    cursor: pointer;
-}
-.drug-row {
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.drug-row:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-.btn-primary {
-    font-size:16px;
-    transition: all 0.3s;
-}
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-}
-
-/* Records Links Styling */
-.record-links .record-btn {
-    padding: 12px 25px;
-    border-radius: 10px;
-    font-weight:600;
-    text-decoration:none;
-    color:#fff;
-    transition: all 0.3s;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    flex: 1 1 200px;
-    text-align:center;
-}
-.record-links .record-btn:nth-child(1) { background: #3498db; }
-.record-links .record-btn:nth-child(2) { background: #27ae60; }
-.record-links .record-btn:nth-child(3) { background: #f39c12; }
-
-.record-links .record-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.25);
-}
-</style>
 {% endblock %}

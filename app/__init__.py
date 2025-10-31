@@ -51,7 +51,11 @@ def create_app():
     from app.views.outpatient_views import outpatient_bp
     from app.views.delivery_views import delivery_bp
     from app.views.doctor_views import doctor_bp
+    from app.views.nurse_views import nurse_bp
 
+
+    
+    app.register_blueprint(nurse_bp)
     app.register_blueprint(doctor_bp, url_prefix="/doctor")
     app.register_blueprint(patient_bp, url_prefix="/patients")
     app.register_blueprint(pharmacy_bp, url_prefix="/pharmacy")

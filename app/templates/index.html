@@ -14,8 +14,15 @@
 
         <div class="row g-4 justify-content-center">
             <div class="col-md-3">
-                <a href="{{ url_for('doctor.doctor_dashboard') }}" class="btn btn-secondary w-100 py-3">
+                <a href="{{ url_for('doctor.dashboard') }}" class="btn btn-secondary w-100 py-3">
                     Doctor's Dashboard.
+                </a>
+            </div>
+
+            <!-- Nurses -->
+            <div class="col-md-3">
+                <a href="{{ url_for('nurse.dashboard') }}" class="btn btn-info w-100 py-3">
+                    Nurses Dashboard
                 </a>
             </div>
             <!-- Patients -->
@@ -35,9 +42,13 @@
             <!-- Laboratory -->
             <div class="col-md-3">
 
-                    <a href="{{ url_for('lab.lab_index') }}" class="btn btn-warning w-100 py-3">
-                        Laboratory
-                    </a>
+                {% if latest_visit %}
+                <a href="{{ url_for('lab.lab_requests', patient_id=latest_visit.patient_id) }}" class="btn btn-warning w-100 py-3">
+                    View Lab Requests
+                </a>
+                {% else %}
+                <button class="btn btn-secondary w-100 py-3" disabled>No Lab Visits Found</button>
+                {% endif %}
                 
             </div>
 

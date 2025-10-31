@@ -109,37 +109,7 @@ def dispense_drug():
 
 from sqlalchemy.orm import joinedload
 
-# def get_dispense_summary(period="day"):
-#     now = datetime.utcnow()
 
-#     # Start with the base query
-#     query = DispenseRecord.query.options(
-#         joinedload(DispenseRecord.patient),
-#         joinedload(DispenseRecord.drug)
-#     ).all()
-
-#     if period == "day":
-#         today = date.today()
-#         query = query.filter(func.date(DispenseRecord.dispensed_at) == today)
-#     elif period == "week":
-#         start_of_week = now - timedelta(days=now.weekday())
-#         query = query.filter(DispenseRecord.dispensed_at >= start_of_week)
-#     elif period == "month":
-#         start_of_month = datetime(now.year, now.month, 1)
-#         query = query.filter(DispenseRecord.dispensed_at >= start_of_month)
-
-#     # Totals
-#     records = query.all()
-#     total_drugs_dispensed = sum(r.quantity_dispensed for r in records)
-#     total_amount_paid = sum(r.amount_paid or 0 for r in records)
-#     total_cost = sum(r.total_cost or 0 for r in records)
-
-#     return {
-#         "total_drugs_dispensed": total_drugs_dispensed,
-#         "total_amount_paid": total_amount_paid,
-#         "total_cost": total_cost,
-#         "records": records
-#     }
 
 def get_dispense_summary(period="day", year=None, month=None):
     now = datetime.utcnow()
@@ -216,11 +186,21 @@ def get_available_months():
     return months
 
 
-@dispensary_bp.route("/dispensary")
-@login_required
-def dispensary_view():
-    prescriptions = Prescription.query.filter_by(is_dispensed=False).all()
-    return render_template("dispensary/prescriptions.html", prescriptions=prescriptions)
+
+@dispensary_bp.route("/dispensary/dashboard")
+def dispensary_dashboard():
+    prescriptions = Prescription.query.filter_by(status="Pending").all()
+    return render_template("dispensary/dashboard.html", prescriptions=prescriptions)
+
+
+@dispensary_bp.route("/dispensary/prescription/<int:prescription_id>/dispense", methods=["POST"])
+def dispense_prescription(prescription_id):
+    prescription = Prescription.query.get_or_404(prescription_id)
+    prescription.status = "Dispensed"
+    db.session.commit()
+    flash("Prescription dispensed", "success")
+    return redirect(url_for("dispensary.dispensary_dashboard"))
+
 
 
 

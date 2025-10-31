@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  /* Reset & Base */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+    color: #2c3e50;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Container */
+  .nurse-container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* Header */
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  .dashboard-header h2 {
+    font-size: 2rem;
+    color: #1a5fb4;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .dashboard-header .subtitle {
+    color: #5a6c7d;
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+
+  /* Form Styling */
+  .med-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2.5rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .med-form input,
+  .med-form select,
+  .med-form textarea {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 1.5px solid #d1dbe4;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #fafcff;
+  }
+
+  .med-form input:focus,
+  .med-form select:focus,
+  .med-form textarea:focus {
+    outline: none;
+    border-color: #1a5fb4;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(26, 95, 180, 0.15);
+  }
+
+  .med-form textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn.primary {
+    background: linear-gradient(135deg, #1a5fb4, #0d47a1);
+    color: white;
+  }
+
+  .btn.primary:hover {
+    background: linear-gradient(135deg, #0d47a1, #0b3d91);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(26, 95, 180, 0.3);
+  }
+
+  .btn.full {
+    width: 100%;
+    margin-top: 0.8rem;
+  }
+
+  /* Records Section */
+  .records-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  .records-section h3 {
+    font-size: 1.5rem;
+    color: #1a5fb4;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e3eaf1;
+  }
+
+  /* Table Styling */
+  .record-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .record-table th {
+    background: linear-gradient(135deg, #1a5fb4, #0d47a1);
+    color: white;
+    text-align: left;
+    padding: 1rem 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+  }
+
+  .record-table th:first-child { border-top-left-radius: 10px; }
+  .record-table th:last-child { border-top-right-radius: 10px; }
+
+  .record-table td {
+    padding: 1rem 0.8rem;
+    border-bottom: 1px solid #e3eaf1;
+  }
+
+  .record-table tr:hover {
+    background-color: #f8fbff;
+    transition: background-color 0.2s ease;
+  }
+
+  .record-table .empty {
+    text-align: center;
+    color: #95a5b8;
+    font-style: italic;
+    padding: 2rem 0;
+  }
+
+  /* Responsive Design */
+  @media (min-width: 640px) {
+    .form-grid {
+      grid-template-columns: 2fr 1fr 1fr;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .nurse-container {
+      padding: 0 2rem;
+    }
+
+    .dashboard-header h2 {
+      font-size: 2.3rem;
+    }
+
+    .med-form,
+    .records-section {
+      padding: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .form-grid {
+      gap: 1.5rem;
+    }
+  }
+
+  /* Print-friendly */
+  @media print {
+    body { background: white; }
+    .nurse-container { box-shadow: none; }
+    .med-form, .records-section { box-shadow: none; border: 1px solid #ddd; }
+  }
+</style>
+
+<div class="nurse-container">
+  <div class="dashboard-header">
+    <h2>📋 Medication Chart</h2>
+    <p class="subtitle">Record and review medication administration for {{ patient.full_name() }}.</p>
+  </div>
+
+  <form method="POST" class="med-form">
+    <div class="form-grid">
+      <input type="text" name="medication_name" placeholder="Medication Name" required>
+      <input type="text" name="dosage" placeholder="Dosage (e.g. 500mg)">
+      <select name="route" required>
+        <option value="">Select Route</option>
+        <option value="IV">Intravenous (IV)</option>
+        <option value="IM">Intra Muscular (IM)</option>
+        <option value="Subcute">Subcutaneous</option>
+        <option value="Subl">Sublingual</option>
+        <option value="Oral">Oral</option>
+      </select>
+    </div>
+
+    <textarea name="notes" rows="3" placeholder="Notes (optional)"></textarea>
+    <button type="submit" class="btn primary full">✅ Record Administration</button>
+  </form>
+
+  <div class="records-section">
+    <h3>Previous Administrations</h3>
+    <table class="record-table">
+      <thead>
+        <tr>
+          <th>Medication</th>
+          <th>Dosage</th>
+          <th>Route</th>
+          <th>Date & Time</th>
+          <th>Nurse</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in records %}
+        <tr>
+          <td>{{ record.medication_name }}</td>
+          <td>{{ record.dosage }}</td>
+          <td>{{ record.route }}</td>
+          <td>{{ record.administration_time.strftime('%Y-%m-%d %H:%M') }}</td>
+          <td>{{ record.nurse.username }}</td>
+          <td>{{ record.notes or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty">No administration records yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,6 +1,180 @@
 <!-- templates/doctor/lab_request_form.html -->
-<h3>Lab Request for {{ patient.full_name() }}</h3>
-<form method="post">
-  <textarea name="tests" rows="6" cols="60" placeholder="Enter requested tests"></textarea><br>
-  <button type="submit">Submit</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab Request - {{ patient.full_name() }}</title>
+  <style>
+    /* ======= GLOBAL RESET ======= */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: #f5f8fa;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+    }
+
+    /* ======= CONTAINER ======= */
+    .container {
+      background: #fff;
+      width: 100%;
+      max-width: 600px;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ======= DASHBOARD BUTTON ======= */
+    .btn-dashboard {
+      display: block;
+      text-align: center;
+      background: #0d6efd;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 14px 0;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-dashboard:hover {
+      background: #0b5ed7;
+    }
+
+    /* ======= HEADER ======= */
+    h3 {
+      text-align: center;
+      color: #1e2a3a;
+      margin-bottom: 1.5rem;
+      font-size: 1.4rem;
+      border-bottom: 2px solid #0d6efd;
+      padding-bottom: 0.5rem;
+    }
+
+    /* ======= FORM ======= */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      resize: vertical;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    textarea:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+    }
+
+    button {
+      background: #0d6efd;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #0b5ed7;
+    }
+
+    /* ======= FOOTER LINKS ======= */
+    .footer-links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      flex: 1 1 48%;
+      text-decoration: none;
+      text-align: center;
+      background: #f1f4f9;
+      padding: 12px 0;
+      border-radius: 10px;
+      color: #0d6efd;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      background: #0d6efd;
+      color: #fff;
+    }
+
+    /* ======= RESPONSIVENESS ======= */
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.5rem;
+      }
+
+      h3 {
+        font-size: 1.2rem;
+      }
+
+      textarea {
+        min-height: 120px;
+      }
+
+      .footer-links {
+        flex-direction: column;
+      }
+
+      .footer-links a {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="{{ url_for('doctor.dashboard') }}" class="btn-dashboard">
+      ⬅ Back to Dashboard
+    </a>
+
+    <h3>🧪 Lab Request for {{ patient.full_name() }}</h3>
+
+    <form method="post">
+      <textarea name="tests" placeholder="Enter the requested lab tests..."></textarea>
+      <button type="submit">Submit Request</button>
+    </form>
+
+    <div class="footer-links">
+      <a href="{{ url_for('doctor.update_patient_card', patient_id=patient.id) }}">🗂 Patient Card</a>
+      <a href="{{ url_for('doctor.create_prescription', patient_id=patient.id) }}">💊 Prescription</a>
+    </div>
+  </div>
+</body>
+</html>

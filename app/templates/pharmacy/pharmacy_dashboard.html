@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  /* Base & Reset */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f3f9ff 0%, #e8f4fc 100%);
+    color: #2c3e50;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Main Container */
+  .pharmacy-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  /* Header Section */
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: white;
+    padding: 1.8rem 2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
+    margin-bottom: 2rem;
+  }
+
+  .dashboard-header h2 {
+    font-size: 2.1rem;
+    color: #1976d2;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .back-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: #546e7a;
+    border: 2px solid #b0bec5;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+  }
+
+  .back-home-btn:hover {
+    background: #eceff1;
+    border-color: #78909c;
+    color: #263238;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(84, 110, 122, 0.2);
+  }
+
+  /* Table Container */
+  .table-container {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.07);
+  }
+
+  /* Table Styling */
+  .pharmacy-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.96rem;
+  }
+
+  .pharmacy-table thead {
+    background: linear-gradient(135deg, #1976d2, #1565c0);
+    color: white;
+  }
+
+  .pharmacy-table th {
+    padding: 1.3rem 1rem;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    letter-spacing: 0.6px;
+  }
+
+  .pharmacy-table td {
+    padding: 1.2rem 0.9rem;
+    text-align: center;
+    border-bottom: 1px solid #e3f2fd;
+    vertical-align: middle;
+  }
+
+  .pharmacy-table tbody tr {
+    transition: all 0.25s ease;
+  }
+
+  .pharmacy-table tbody tr:hover {
+    background-color: #f5faff;
+    transform: scale(1.005);
+    box-shadow: 0 4px 14px rgba(25, 118, 210, 0.1);
+  }
+
+  .patient-name {
+    font-weight: 600;
+    color: #1565c0;
+  }
+
+  /* Action Buttons */
+  .btn-sm {
+    padding: 0.55rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    justify-content: center;
+  }
+
+  .btn-outline-primary {
+    color: #1976d2;
+    border: 2px solid #90caf9;
+    background: transparent;
+  }
+
+  .btn-outline-primary:hover {
+    background: #e3f2fd;
+    border-color: #42a5f5;
+    color: #0d47a1;
+    transform: translateY(-1px);
+  }
+
+  .btn-outline-success {
+    color: #2e7d32;
+    border: 2px solid #a5d6a7;
+    background: transparent;
+  }
+
+  .btn-outline-success:hover {
+    background: #e8f5e9;
+    border-color: #66bb6a;
+    color: #1b5e20;
+    transform: translateY(-1px);
+  }
+
+  .btn-outline-warning {
+    color: #f9a825;
+    border: 2px solid #ffe082;
+    background: transparent;
+  }
+
+  .btn-outline-warning:hover {
+    background: #fff8e1;
+    border-color: #ffca28;
+    color: #e65100;
+    transform: translateY(-1px);
+  }
+
+  /* Empty State */
+  .empty-state {
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    border-radius: 16px;
+    margin: 2rem 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(21, 101, 192, 0.1);
+  }
+
+  .empty-state::before {
+    content: "📋";
+    display: block;
+    font-size: 3rem;
+    margin-bottom: 0.8rem;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .dashboard-header {
+      flex-direction: column;
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .dashboard-header h2 {
+      font-size: 1.8rem;
+    }
+
+    .back-home-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .pharmacy-table th,
+    .pharmacy-table td {
+      padding: 0.9rem 0.6rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-sm {
+      padding: 0.45rem 0.8rem;
+      font-size: 0.8rem;
+      min-width: 100px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .pharmacy-dashboard {
+      padding: 1.5rem 1rem;
+    }
+
+    .dashboard-header,
+    .table-container {
+      border-radius: 12px;
+    }
+
+    .pharmacy-table {
+      font-size: 0.85rem;
+    }
+
+    .pharmacy-table th,
+    .pharmacy-table td {
+      padding: 0.7rem 0.4rem;
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.78rem;
+      min-width: 90px;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .pharmacy-dashboard {
+      padding: 2.5rem 2rem;
+    }
+
+    .dashboard-header,
+    .table-container {
+      padding: 2rem;
+    }
+  }
+
+  /* Print Styles */
+  @media print {
+    body { background: white; }
+    .pharmacy-dashboard { box-shadow: none; }
+    .table-container { box-shadow: none; border: 1px solid #ddd; }
+    .btn-sm { color: #000 !important; text-decoration: underline; border: none; }
+    .back-home-btn { display: none; }
+  }
+</style>
+
+<div class="pharmacy-dashboard">
+  <div class="dashboard-header">
+    <h2>Pharmacy Dashboard</h2>
+    <a href="{{ url_for('index') }}" class="back-home-btn">Back to Home</a>
+  </div>
+
+  {% if patients %}
+  <div class="table-container">
+    <table class="pharmacy-table">
+      <thead>
+        <tr>
+          <th>Hospital No</th>
+          <th>Patient Name</th>
+          <th>Prescriptions</th>
+          <th>Documentation</th>
+          <th>Dispense</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for patient in patients %}
+        <tr>
+          <td>{{ patient.hospital_number }}</td>
+          <td class="patient-name">{{ patient.full_name() }}</td>
+          <td>
+            <a href="{{ url_for('pharmacy.view_prescription', patient_id=patient.id) }}"
+               class="btn btn-sm btn-outline-primary">
+              View Prescriptions
+            </a>
+          </td>
+          <td>
+            <a href="{{ url_for('pharmacy.view_documentation', patient_id=patient.id) }}"
+               class="btn btn-sm btn-outline-success">
+              View Patient's File
+            </a>
+          </td>
+          <td>
+            <a href="{{ url_for('pharmacy.dispense_drug', patient_id=patient.id) }}"
+               class="btn btn-sm btn-outline-warning">
+              Dispense
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    No prescriptions available yet.
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

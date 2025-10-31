@@ -67,6 +67,9 @@ class User(db.Model, UserMixin):
 
     def is_admin(self):
         return self.role in ["admin", "super_admin"]  # super_admins also count as admins
+    
+    def is_nurse(self):
+        return self.role in ["nurse_admin", "Nursing_Admin", "super_admin"]
 
     def __repr__(self):
         return f"<User {self.username} ({self.role})>"
@@ -102,7 +105,6 @@ class Patient(db.Model):
     address = db.Column(db.String(256))
     phone_number = db.Column(db.String(32))
     nhis_status = db.Column(db.Enum(NHISStatus), nullable=False, default=NHISStatus.NON_NHIS)
-    # nhis_status = db.Column(db.String(20), nullable=False, default="NON_NHIS")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # relationships
@@ -152,24 +154,64 @@ class Prescription(db.Model):
     drugs = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_dispensed = db.Column(db.Boolean, default=False)
-
+    status = db.Column(db.String(50), default="Pending")
     patient = db.relationship("Patient", backref="prescriptions")
     doctor = db.relationship("User", backref="prescriptions")
 
 
 class LabRequest(db.Model):
     __tablename__ = "lab_requests"
+
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey("patients.id"), nullable=False)
     doctor_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    visit_id = db.Column(db.Integer, db.ForeignKey("lab_visit.id"), nullable=True)
+
     tests_requested = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_completed = db.Column(db.Boolean, default=False)
+    status = db.Column(db.String(20), default="Pending")
 
+    # relationships
     patient = db.relationship("Patient", backref="lab_requests")
     doctor = db.relationship("User", backref="lab_requests")
+    visit = db.relationship("LabVisit", back_populates="lab_requests")
+
+    def __repr__(self):
+        return f"<LabRequest {self.id} - {self.status}>"
 
 
+class LabVisit(db.Model):
+    __tablename__ = "lab_visit"
+
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey("patients.id"), nullable=True)
+
+    # cached info
+    patient_name = db.Column(db.String(120))
+    patient_surname = db.Column(db.String(120))
+    patient_age = db.Column(db.Integer)
+    sex = db.Column(db.String(10))
+    nhis_status = db.Column(db.String(20))  # NHIS / Non-NHIS
+    inpatient_status = db.Column(db.String(20))  # Inpatient / Outpatient
+    phone_number = db.Column(db.String(20))
+
+    sample = db.Column(db.String(120))
+    referring_physician = db.Column(db.String(120))
+    laboratory_number = db.Column(db.String(50), unique=True)
+
+    investigations = db.Column(db.Text, nullable=False)
+    amount_paid = db.Column(db.Float, nullable=False, default=0.0)
+    result = db.Column(db.Text, nullable=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # relationships
+    patient = db.relationship("Patient", back_populates="lab_visits")
+    lab_requests = db.relationship("LabRequest", back_populates="visit")
+
+    def __repr__(self):
+        return f"<LabVisit {self.patient_name} {self.patient_surname} - {self.investigations}>"
 
 class OperationDiary(db.Model):
     __tablename__ = "operation_diary"
@@ -216,9 +258,9 @@ class InPatientRecord(db.Model):
     __tablename__ = "inpatients"
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey("patients.id"), nullable=False)
-    hospital_number = db.Column(db.String(50))  # optional
+    hospital_number = db.Column(db.String(50)) 
     patient_name = db.Column(db.String(256), nullable=False)
-    sex = db.Column(db.String(20))  # 👈 changed from Enum to String
+    sex = db.Column(db.String(20)) 
     age = db.Column(db.Integer)
     diagnosis = db.Column(db.Text)
     medications_given = db.Column(db.Text)
@@ -337,35 +379,7 @@ class DispenseRecord(db.Model):
         return f"<DispenseRecord {self.patient.full_name()} - {self.drug.name}>"
 
 
-class LabVisit(db.Model):
-    __tablename__ = "lab_visit"
 
-    id = db.Column(db.Integer, primary_key=True)  
-    patient_id = db.Column(db.Integer, db.ForeignKey("patients.id"), nullable=True)
-
-    # cached info
-    patient_name = db.Column(db.String(120))
-    patient_surname = db.Column(db.String(120))
-    patient_age = db.Column(db.Integer)
-    sex = db.Column(db.String(10))
-    nhis_status = db.Column(db.String(20))  # NHIS / Non-NHIS
-    inpatient_status = db.Column(db.String(20))  # Inpatient / Outpatient
-    phone_number = db.Column(db.String(20))
-
-    sample = db.Column(db.String(120))
-    referring_physician = db.Column(db.String(120))
-    laboratory_number = db.Column(db.String(50), unique=True)
-
-    investigations = db.Column(db.Text, nullable=False)  
-    amount_paid = db.Column(db.Float, nullable=False, default=0.0)
-
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  
-
-    # relationship back to patient
-    patient = db.relationship("Patient", back_populates="lab_visits")
-
-    def __repr__(self):
-        return f"<LabVisit {self.patient_name} {self.patient_surname} - {self.investigations}>"
 
 
 
@@ -536,6 +550,21 @@ def update_finance_record(day=None):
     db.session.add(record)
     db.session.commit()
     return record
+
+
+class MedicationAdministration(db.Model):
+    __tablename__ = "medication_administration"
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey("patients.id"), nullable=False)
+    nurse_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    medication_name = db.Column(db.String(100), nullable=False)
+    dosage = db.Column(db.String(50))  # e.g. "500 mg" or "1 g"
+    route = db.Column(db.String(20))   # IV, IM, Subcute, Subl, Oral
+    administration_time = db.Column(db.DateTime, default=datetime.utcnow)
+    notes = db.Column(db.Text)
+
+    nurse = db.relationship("User", backref="administrations")
+    patient = db.relationship("Patient", backref="med_admin_records")
 
 
 if __name__ == "__main__":

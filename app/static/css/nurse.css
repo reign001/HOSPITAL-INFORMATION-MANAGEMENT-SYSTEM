@@ -1,0 +1,91 @@
+/* ============================= */
+/* Nurse Prescription Page Styles */
+/* ============================= */
+
+.prescription-container {
+  animation: fadeIn 0.5s ease-in-out;
+  color: #2c3e50;
+}
+
+.prescription-header {
+  flex-wrap: wrap;
+}
+
+.patient-name {
+  color: #0d6efd;
+}
+
+.prescription-card {
+  background: #ffffff;
+  border-radius: 1rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.prescription-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.prescription-meta {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 10px;
+}
+
+.prescription-details h5 {
+  color: #34495e;
+}
+
+.prescription-content {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-family: 'Courier New', monospace;
+  white-space: pre-wrap;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  line-height: 1.5;
+  border: 1px solid #e0e0e0;
+}
+
+.no-prescription {
+  font-size: 1.05rem;
+  text-align: center;
+  background-color: #f9fafc;
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+/* Back Button */
+.back-btn {
+  transition: all 0.3s ease-in-out;
+  font-weight: 500;
+  border-radius: 30px;
+}
+
+.back-btn:hover {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .prescription-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .prescription-content {
+    font-size: 0.9rem;
+  }
+
+  .back-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

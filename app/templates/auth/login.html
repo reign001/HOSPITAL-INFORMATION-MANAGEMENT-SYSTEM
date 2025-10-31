@@ -1,118 +1,242 @@
-{% extends "base.html" %}
 {% block content %}
-<div class="login-wrapper d-flex justify-content-center align-items-center min-vh-100 bg-light">
-    <div class="login-card shadow-lg rounded-4 p-5 bg-white" style="max-width: 420px; width: 100%;">
-        
-        <!-- Title -->
-        <h2 class="mb-4 text-center fw-bold" style="color: #2c3e50; letter-spacing: 1px;">
-            🔐 Secure Login
-        </h2>
+<div class="login-page">
+  <div class="login-container">
+    
+    <!-- Title -->
+    <h2 class="login-title">🔐 Secure Login</h2>
 
-        <!-- Login Form -->
-        <form method="post" class="login-form">
-            <!-- Username -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold text-secondary">Username</label>
-                <input type="text" 
-                       name="username" 
-                       class="form-control custom-input rounded-pill px-3 py-2 shadow-sm border-0" 
-                       placeholder="Enter your username" required>
-            </div>
+    <!-- Login Form -->
+    <form method="post" class="login-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" type="text" name="username" placeholder="Enter your username" required>
+      </div>
 
-            <!-- Password -->
-            <div class="mb-4">
-                <label class="form-label fw-semibold text-secondary">Password</label>
-                <input type="password" 
-                       name="password" 
-                       class="form-control custom-input rounded-pill px-3 py-2 shadow-sm border-0" 
-                       placeholder="Enter your password" required>
-            </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" placeholder="Enter your password" required>
+      </div>
 
-            <!-- Submit -->
-            <button type="submit" 
-                    class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm login-btn">
-                🔓 Login
-            </button>
-        </form>
+      <button type="submit" class="btn-login">
+        🔓 Login
+      </button>
+    </form>
 
-        <!-- Divider -->
-        <hr class="my-5">
+    <hr class="divider">
 
-        <!-- Admin Tools -->
-        <div class="admin-tools text-center">
-            <p class="fw-bold mb-3 text-secondary">⚙️ Admin Tools</p>
-            <div class="d-flex flex-wrap justify-content-center gap-2">
-                <a href="{{ url_for('auth.add_admin') }}" 
-                   class="btn btn-gradient-green btn-sm rounded-pill px-3 shadow-sm">
-                   ➕ Add Admin
-                </a>
-                <a href="{{ url_for('auth.manage_admins') }}" 
-                   class="btn btn-gradient-blue btn-sm rounded-pill px-3 shadow-sm">
-                   👥 Manage Admins
-                </a>
-                <a href="{{ url_for('auth.reset_superadmin') }}" 
-                   class="btn btn-gradient-orange btn-sm rounded-pill px-3 shadow-sm">
-                   🔑 Reset Superadmin
-                </a>
-            </div>
+    <!-- Admin Tools -->
+    <div class="admin-tools">
+      <p class="tools-title">⚙️ Admin Tools</p>
+      <div class="tools-links">
+        <a href="{{ url_for('auth.add_admin') }}" class="btn-link green">➕ Add Admin</a>
+        <a href="{{ url_for('auth.manage_admins') }}" class="btn-link blue">👥 Manage Admins</a>
+        <a href="{{ url_for('auth.reset_superadmin') }}" class="btn-link orange">🔑 Reset Superadmin</a>
+      </div>
 
-            <p class="text-muted mt-4 small fst-italic">
-                To reset a specific admin's password: open <em>Manage Admins</em> and use the 
-                <strong>"Reset Password"</strong> button.
-            </p>
-        </div>
+      <p class="tools-note">
+        To reset a specific admin's password, open 
+        <em>Manage Admins</em> and use the <strong>"Reset Password"</strong> button.
+      </p>
     </div>
+  </div>
 </div>
+{% endblock %}
 
 <style>
-    /* Input Focus Effect */
-    .custom-input:focus {
-        box-shadow: 0 0 0 0.2rem rgba(46, 134, 222, 0.25);
-    }
+    /* ===== GLOBAL STYLES ===== */
+* {
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
-    /* Gradient Button Styles */
-    .btn-gradient-green {
-        background: linear-gradient(45deg, #27ae60, #2ecc71);
-        color: #fff;
-        border: none;
-        transition: all 0.3s ease;
-    }
-    .btn-gradient-green:hover {
-        background: linear-gradient(45deg, #2ecc71, #27ae60);
-        transform: translateY(-2px);
-    }
+body {
+  background: linear-gradient(135deg, #e0f7fa, #e3f2fd);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
 
-    .btn-gradient-blue {
-        background: linear-gradient(45deg, #2980b9, #3498db);
-        color: #fff;
-        border: none;
-        transition: all 0.3s ease;
-    }
-    .btn-gradient-blue:hover {
-        background: linear-gradient(45deg, #3498db, #2980b9);
-        transform: translateY(-2px);
-    }
+/* ===== PAGE WRAPPER ===== */
+.login-page {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
 
-    .btn-gradient-orange {
-        background: linear-gradient(45deg, #e67e22, #f39c12);
-        color: #fff;
-        border: none;
-        transition: all 0.3s ease;
-    }
-    .btn-gradient-orange:hover {
-        background: linear-gradient(45deg, #f39c12, #e67e22);
-        transform: translateY(-2px);
-    }
+.login-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem 2rem;
+  animation: fadeIn 0.4s ease-in-out;
+}
 
-    /* Login button hover effect */
-    .login-btn {
-        background: linear-gradient(45deg, #1d6fa5, #2980b9);
-        border: none;
-        transition: all 0.3s ease;
-    }
-    .login-btn:hover {
-        background: linear-gradient(45deg, #2980b9, #1d6fa5);
-        transform: translateY(-2px);
-    }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== TITLE ===== */
+.login-title {
+  text-align: center;
+  color: #0d47a1;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.8rem;
+  letter-spacing: 1px;
+}
+
+/* ===== FORM ===== */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #2c3e50;
+}
+
+.form-group input {
+  padding: 12px 16px;
+  border-radius: 50px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+  outline: none;
+}
+
+/* ===== LOGIN BUTTON ===== */
+.btn-login {
+  background: linear-gradient(90deg, #1976d2, #42a5f5);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+  background: linear-gradient(90deg, #1565c0, #2196f3);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+  transform: translateY(-1px);
+}
+
+/* ===== DIVIDER ===== */
+.divider {
+  margin: 2.5rem 0;
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #ccc, transparent);
+}
+
+/* ===== ADMIN TOOLS ===== */
+.admin-tools {
+  text-align: center;
+}
+
+.tools-title {
+  font-weight: 700;
+  color: #37474f;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.tools-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+/* Colored buttons */
+.btn-link {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  color: white;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-link.green {
+  background: linear-gradient(90deg, #2e7d32, #66bb6a);
+}
+.btn-link.green:hover {
+  background: linear-gradient(90deg, #1b5e20, #43a047);
+  transform: translateY(-1px);
+}
+
+.btn-link.blue {
+  background: linear-gradient(90deg, #1565c0, #42a5f5);
+}
+.btn-link.blue:hover {
+  background: linear-gradient(90deg, #0d47a1, #2196f3);
+  transform: translateY(-1px);
+}
+
+.btn-link.orange {
+  background: linear-gradient(90deg, #ef6c00, #ffa726);
+}
+.btn-link.orange:hover {
+  background: linear-gradient(90deg, #e65100, #fb8c00);
+  transform: translateY(-1px);
+}
+
+.tools-note {
+  font-size: 0.85rem;
+  color: #757575;
+  line-height: 1.5;
+}
+
+/* ===== RESPONSIVENESS ===== */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 2rem 1.2rem;
+  }
+
+  .login-title {
+    font-size: 1.5rem;
+  }
+
+  .form-group input {
+    font-size: 0.9rem;
+    padding: 10px 14px;
+  }
+
+  .btn-login {
+    font-size: 0.9rem;
+  }
+
+  .btn-link {
+    font-size: 0.8rem;
+    padding: 8px 14px;
+  }
+}
+
 </style>
-{% endblock %}

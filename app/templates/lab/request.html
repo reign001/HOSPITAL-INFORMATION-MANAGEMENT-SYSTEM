@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  /* ===== Custom Styling ===== */
+  .lab-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .lab-header h2 {
+    color: #1976d2;
+    font-weight: 700;
+    font-size: 1.8rem;
+  }
+
+  .lab-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+  }
+
+  .table-responsive {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    background-color: #1976d2;
+    color: #fff;
+    font-weight: 600;
+    padding: 12px;
+    text-align: left;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+
+  tr:hover {
+    background-color: #f5faff;
+  }
+
+  .status {
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 8px;
+  }
+
+  .status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+
+  .status-completed {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .btn-process {
+    background-color: #1976d2;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-process:hover {
+    background-color: #125ca1;
+    text-decoration: none;
+    color: #fff;
+  }
+
+  .back-btn {
+    background-color: #6c757d;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: 0.3s ease;
+  }
+
+  .back-btn:hover {
+    background-color: #5a6268;
+    color: #fff;
+  }
+
+  @media (max-width: 768px) {
+    th, td {
+      font-size: 0.9rem;
+      padding: 8px;
+    }
+    .lab-header h2 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<div class="container mt-4">
+  <div class="lab-header">
+    <h2>🧬 Lab Requests</h2>
+  </div>
+
+  <div class="lab-card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Tests</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in requests %}
+            <tr>
+              <td>{{ req.patient.full_name() }}</td>
+              <td>{{ req.tests_requested }}</td>
+              <td>
+                <span class="status 
+                  {% if req.status == 'Pending' %}status-pending{% elif req.status == 'Completed' %}status-completed{% endif %}">
+                  {{ req.status }}
+                </span>
+              </td>
+              <td>
+                <a href="{{ url_for('lab.process_lab_request', request_id=req.id) }}" class="btn-process">
+                  <i class="bi bi-pencil-square me-1"></i> Process
+                </a>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="4" class="text-center py-4 text-muted">
+                <i class="bi bi-inbox"></i> No lab requests found
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<br><br>
+<div>
+    <a href="{{ url_for('lab.lab_index') }}" class="back-btn">
+      <i class="bi bi-arrow-left-circle me-2"></i> Back to Dashboard
+    </a>
+</div>
+
+{% endblock %}

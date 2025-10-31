@@ -1,68 +1,91 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-    <div class="card shadow-lg p-5 rounded-4" style="max-width: 500px; width: 100%;">
-        
-        <!-- Header -->
-        <h2 class="text-center mb-4 fw-bold" style="color:#2c3e50; letter-spacing:1px;">
-            ➕ Add Admin / Superadmin
-        </h2>
+<div class="add-wrapper">
+  <div class="add-card">
+    <h2 class="add-title">➕ Add Admin / Superadmin</h2>
 
-        <!-- Form -->
-        <form method="POST">
-            <!-- Username -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold">👤 Username</label>
-                <input type="text" name="username" 
-                       class="form-control form-control-lg rounded-pill shadow-sm border-0 px-3 py-2" 
-                       placeholder="Enter username" required>
-            </div>
+    <form method="POST" class="add-form">
+      <label>👤 Username</label>
+      <input type="text" name="username" placeholder="Enter username" required>
 
-            <!-- Password -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold">🔑 Password</label>
-                <input type="password" name="password" 
-                       class="form-control form-control-lg rounded-pill shadow-sm border-0 px-3 py-2" 
-                       placeholder="Enter password" required>
-            </div>
+      <label>🔑 Password</label>
+      <input type="password" name="password" placeholder="Enter password" required>
 
-            <!-- Role -->
-            <div class="mb-4">
-                <label class="form-label fw-semibold">⚙️ Role</label>
-                <select name="role" 
-                        class="form-select form-select-lg rounded-pill shadow-sm border-0 px-3 py-2">
-                    <option value="admin">Admin</option>
-                    <option value="super_admin">Super Admin</option>
-                </select>
-            </div>
+      <label>⚙️ Role</label>
+      <select name="role" required>
+        <option value="admin">Admin</option>
+        <option value="super_admin">Super Admin</option>
+        <option value="Nursing_Admin">Nursing Admin</option>
+        <option value="Doctor_Admin">Doctor Admin</option>
+        <option value="Record_Admin">Record Admin</option>
+        <option value="Pharmacy_Admin">Pharmacy Admin</option>
+        <option value="Finance_Admin">Finance Admin</option>
+      </select>
 
-            <!-- Submit Button -->
-            <button type="submit" 
-                    class="btn w-100 py-2 fw-bold rounded-pill create-btn shadow-sm">
-                ✅ Create Admin
-            </button>
-        </form>
-    </div>
+      <button type="submit" class="btn-submit">✅ Create Admin</button>
+      <a href="{{ url_for('auth.manage_admins') }}" class="btn-back">↩ Back</a>
+    </form>
+  </div>
 </div>
 
-<!-- Custom Styles -->
 <style>
-    /* Input focus effect */
-    .form-control:focus, .form-select:focus {
-        box-shadow: 0 0 0 0.2rem rgba(46, 134, 222, 0.25);
-    }
-
-    /* Gradient button */
-    .create-btn {
-        background: linear-gradient(45deg, #27ae60, #2ecc71);
-        color: #fff;
-        border: none;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-    }
-    .create-btn:hover {
-        background: linear-gradient(45deg, #2ecc71, #27ae60);
-        transform: translateY(-2px);
-    }
+.add-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  background: linear-gradient(135deg, #e3f2fd, #f1f8e9);
+}
+.add-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 450px;
+  padding: 2rem;
+}
+.add-title {
+  text-align: center;
+  color: #1565c0;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+input, select {
+  padding: 12px;
+  border-radius: 50px;
+  border: 1px solid #cfd8dc;
+  font-size: 0.95rem;
+  transition: 0.3s;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: #42a5f5;
+  box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.25);
+}
+.btn-submit {
+  background: linear-gradient(90deg, #1976d2, #42a5f5);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.btn-submit:hover {
+  transform: translateY(-1px);
+}
+.btn-back {
+  text-decoration: none;
+  text-align: center;
+  color: #1565c0;
+  font-weight: 600;
+  margin-top: 10px;
+}
 </style>
 {% endblock %}

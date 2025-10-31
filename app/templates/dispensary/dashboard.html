@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  /* Base & Reset */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5faff 0%, #e6f4fc 100%);
+    color: #2c3e50;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Main Container */
+  .prescription-container {
+    max-width: 1000px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+  }
+
+  /* Page Title */
+  .page-title {
+    font-size: 2.2rem;
+    color: #1565c0;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+  }
+
+  /* Table Card */
+  .table-card {
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Table Styling */
+  .prescription-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  .prescription-table thead {
+    background: linear-gradient(135deg, #1976d2, #1565c0);
+    color: white;
+  }
+
+  .prescription-table th {
+    padding: 1.3rem 1rem;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    letter-spacing: 0.7px;
+  }
+
+  .prescription-table td {
+    padding: 1.2rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid #e3f2fd;
+    vertical-align: middle;
+  }
+
+  .prescription-table tbody tr {
+    transition: all 0.3s ease;
+  }
+
+  .prescription-table tbody tr:hover {
+    background-color: #f5faff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(25, 118, 210, 0.12);
+  }
+
+  /* Patient Name */
+  .patient-name {
+    font-weight: 600;
+    color: #1565c0;
+  }
+
+  /* Drugs List */
+  .drugs-list {
+    color: #2c5282;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  /* Dispense Form */
+  .dispense-form {
+    display: inline-block;
+    margin: 0;
+  }
+
+  .dispense-btn {
+    background: linear-gradient(135deg, #43a047, #2e7d32);
+    color: white;
+    border: none;
+    padding: 0.65rem 1.4rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(67, 160, 71, 0.25);
+  }
+
+  .dispense-btn:hover {
+    background: linear-gradient(135deg, #2e7d32, #1b5e20);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20, 0 8px 20px rgba(67, 160, 71, 0.35);
+  }
+
+  .dispense-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 3.5rem 1.5rem;
+    color: #90a4ae;
+    font-style: italic;
+    font-size: 1.1rem;
+  }
+
+  .empty-state::before {
+    content: "No pending prescriptions";
+    display: block;
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .prescription-container {
+      padding: 0 1rem;
+      margin: 1.5rem auto;
+    }
+
+    .page-title {
+      font-size: 1.9rem;
+    }
+
+    .prescription-table th,
+    .prescription-table td {
+      padding: 0.9rem 0.6rem;
+      font-size: 0.88rem;
+    }
+
+    .dispense-btn {
+      padding: 0.55rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .drugs-list {
+      font-size: 0.85rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .prescription-table {
+      font-size: 0.82rem;
+    }
+
+    .prescription-table th,
+    .prescription-table td {
+      padding: 0.7rem 0.4rem;
+    }
+
+    .dispense-btn {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.8rem;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .page-title {
+      font-size: 1.7rem;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .prescription-container {
+      padding: 0 2rem;
+    }
+
+    .table-card {
+      border-radius: 20px;
+    }
+  }
+
+  /* Print Styles */
+  @media print {
+    body { background: white; }
+    .prescription-container { margin: 0; padding: 0; }
+    .table-card { box-shadow: none; border: 1px solid #ddd; }
+    .dispense-btn { 
+      background: #43a047 !important; 
+      color: white !important; 
+      border: 1px solid #43a047 !important;
+    }
+  }
+</style>
+
+<div class="prescription-container">
+  <h2 class="page-title">Pending Prescriptions</h2>
+
+  <div class="table-card">
+    <table class="prescription-table">
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Drugs</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pres in prescriptions %}
+        <tr>
+          <td class="patient-name">{{ pres.patient.full_name() }}</td>
+          <td class="drugs-list">{{ pres.drugs }}</td>
+          <td>
+            <form method="post" action="{{ url_for('dispensary.dispense_prescription', prescription_id=pres.id) }}" class="dispense-form">
+              <button type="submit" class="dispense-btn">Dispense</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="3" class="empty-state"></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

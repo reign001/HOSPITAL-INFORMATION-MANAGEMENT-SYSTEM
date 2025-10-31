@@ -27,6 +27,24 @@
         💊 Dispense Drug
     </a>
 
+    <a href="{{ url_for('pharmacy.dashboard') }}"
+       style="display:inline-block; background: linear-gradient(135deg, #1976d2, #42a5f5);
+              color:#fff; text-decoration:none; padding:12px 22px; border-radius:10px;
+              font-weight:600; font-size:0.95rem; box-shadow:0 6px 15px rgba(0,0,0,0.15);
+              transition: all 0.3s ease; text-align:center;"
+       onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.2)';"
+       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 15px rgba(0,0,0,0.15)';">
+        Patient Center
+    </a>
+        <a href="{{ url_for('dispensary.dispensary_dashboard') }}"
+       style="display:inline-block; background: linear-gradient(135deg, #1976d2, #42a5f5);
+              color:#fff; text-decoration:none; padding:12px 22px; border-radius:10px;
+              font-weight:600; font-size:0.95rem; box-shadow:0 6px 15px rgba(0,0,0,0.15);
+              transition: all 0.3s ease; text-align:center;"
+       onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.2)';"
+       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 15px rgba(0,0,0,0.15)';">
+        Pending Prescriptions
+    </a>
 </div>
 
 

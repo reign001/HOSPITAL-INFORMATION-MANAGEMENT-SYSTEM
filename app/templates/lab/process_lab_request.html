@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  /* ====== Page Styling ====== */
+  body {
+    background-color: #f8faff;
+  }
+
+  .process-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+  }
+
+  .process-header h3 {
+    color: #1976d2;
+    font-weight: 700;
+    font-size: 1.75rem;
+  }
+
+  .lab-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    transition: 0.3s ease;
+  }
+
+  .lab-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .lab-card p {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+
+  label {
+    color: #333;
+    font-weight: 600;
+  }
+
+  .form-control {
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  textarea.form-control {
+    resize: none;
+  }
+
+  .form-control:focus {
+    border-color: #1976d2;
+    box-shadow: 0 0 0 0.25rem rgba(25, 118, 210, 0.15);
+  }
+
+  .btn-primary {
+    background-color: #1976d2;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #125ca1;
+  }
+
+  .btn-outline-secondary {
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-weight: 600;
+  }
+
+  .patient-info {
+    background-color: #f4f8ff;
+    border: 1px solid #e0ecff;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+  }
+
+  .patient-info p {
+    margin: 5px 0;
+  }
+
+  .badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 768px) {
+    .process-header h3 {
+      font-size: 1.5rem;
+    }
+    .btn {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    .d-flex.justify-content-between {
+      flex-direction: column-reverse;
+    }
+  }
+</style>
+
+<div class="container mt-4 mb-5">
+
+  <div class="process-header">
+    <h3>🧪 Process Lab Request</h3>
+  </div>
+
+  <div class="lab-card">
+
+    <!-- Patient Info Card -->
+    <div class="patient-info mb-4">
+      <p><strong>Patient:</strong> {{ request.patient.first_name }} {{ request.patient.surname }}</p>
+      <p><strong>Tests Requested:</strong> {{ request.tests_requested }}</p>
+      <p><strong>Requested By:</strong> {{ request.doctor.username if request.doctor else 'Unknown' }}</p>
+      <p><strong>Status:</strong> 
+        <span class="badge 
+          {% if request.status == 'Pending' %}bg-warning text-dark
+          {% elif request.status == 'Completed' %}bg-success
+          {% else %}bg-secondary{% endif %}">
+          {{ request.status }}
+        </span>
+      </p>
+    </div>
+
+    <!-- Form Section -->
+    <form method="POST">
+      {% if form and form.csrf_token %}
+        {{ form.csrf_token }}
+      {% endif %}
+
+      <!-- Patient Type -->
+      <div class="form-group mb-3">
+        <label for="patient_type">Patient Type:</label>
+        <select class="form-control" name="patient_type" id="patient_type" required>
+          <option value="" disabled selected>Select type</option>
+          <option value="Inpatient">Inpatient</option>
+          <option value="Outpatient">Outpatient</option>
+          <option value="Emergency">Emergency</option>
+        </select>
+      </div>
+      <br><br>
+      <!-- Sample Type -->
+      <div class="form-group mb-3">
+        <label for="sample_type">Sample Type:</label>
+        <input type="text" class="form-control" name="sample_type" id="sample_type" 
+               placeholder="e.g., Blood, Urine, Stool" required>
+      </div>
+      <br><br>
+      <!-- Amount Paid -->
+      <div class="form-group mb-3">
+        <label for="amount_paid">Amount Paid (₦):</label>
+        <input type="number" class="form-control" name="amount_paid" id="amount_paid" 
+               placeholder="Enter amount" required>
+      </div>
+      <br><br>
+      <!-- Lab Result -->
+      <div class="form-group mb-4">
+        <label for="result">Enter Results:</label>
+        <textarea class="form-control" name="result" id="result" rows="5" 
+                  placeholder="Enter lab results..." required></textarea>
+      </div>
+
+      <!-- Buttons -->
+      <div class="d-flex justify-content-between">
+        <a href="{{ url_for('lab.lab_requests', patient_id=request.patient_id) }}" 
+           class="btn btn-outline-secondary">
+          ← Back
+        </a>
+        <button type="submit" class="btn btn-primary">
+          💾 Submit Result
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

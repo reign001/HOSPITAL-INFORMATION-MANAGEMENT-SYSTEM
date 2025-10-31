@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doctor's Dashboard</title>
+{% extends "base.html" %}
+{% block content %}
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -128,20 +124,39 @@
   </div>
 
   <!-- Patients -->
-  {% for patient in patients %}
-    <div class="patient-folder">
-      <h3>{{ patient.full_name() }} (HN: {{ patient.hospital_number }})</h3>
-      <p>Age: {{ patient.age }} | Sex: {{ patient.sex.value }} | Phone: {{ patient.phone_number }}</p>
+ {% for patient in patients %}
+    {% set visit = patient_visits[patient.id] %}
+    {% set request = patient_requests[patient.id] %}
 
-      <div class="patient-actions">
-        <a href="{{ url_for('doctor.update_patient_card', patient_id=patient.id) }}">🗂 Patient Card</a>
-        <a href="{{ url_for('doctor.create_prescription', patient_id=patient.id) }}">💊 Prescription</a>
-        <a href="{{ url_for('doctor.create_lab_request', patient_id=patient.id) }}">🧪 Lab Request</a>
-      </div>
+    <div class="patient-folder card shadow-sm mb-4 p-3 rounded-3">
+        <h3 class="mb-2">{{ patient.full_name() }} <small class="text-muted">(HN: {{ patient.hospital_number }})</small></h3>
+        <p>Age: {{ patient.age }} | Sex: {{ patient.sex.value }} | Phone: {{ patient.phone_number }}</p>
+
+        <div class="patient-actions d-flex flex-wrap gap-2 mt-3">
+            <a href="{{ url_for('doctor.update_patient_card', patient_id=patient.id) }}" class="btn btn-outline-secondary btn-sm">
+                🗂 Patient Card
+            </a>
+            <a href="{{ url_for('doctor.create_prescription', patient_id=patient.id) }}" class="btn btn-outline-success btn-sm">
+                💊 Prescription
+            </a>
+            <a href="{{ url_for('doctor.create_lab_request', patient_id=patient.id) }}" class="btn btn-outline-primary btn-sm">
+                🧪 Lab Request
+            </a>
+
+            {% if visit and request %}
+                <a href="{{ url_for('lab.lab_detail', visit_id=visit.id, request_id=request.id) }}" class="btn btn-primary btn-sm">
+                    🧪 View Lab Details
+                </a>
+            {% else %}
+                <span class="text-muted small align-self-center">No lab records</span>
+            {% endif %}
+        </div>
     </div>
-  {% else %}
-    <p class="no-patients">No patients found.</p>
-  {% endfor %}
+{% else %}
+    <p class="no-patients text-center text-muted">No patients found.</p>
+{% endfor %}
+
 
 </body>
 </html>
+{%endblock%}

@@ -70,14 +70,8 @@ def list_inpatients():
         db.extract("year", InPatientRecord.admitted_at) == now.year
     ).count()
 
-    return render_template(
-        "inpatient/list.html",
-        inpatients=inpatients,
-        monthly_total=monthly_total,
-        yearly_total=yearly_total,
-        now=now,
-        form=form
-    )
+    return render_template("inpatient/list.html", inpatients=inpatients, monthly_total=monthly_total,
+        yearly_total=yearly_total, now=now, form=form)
 
 
 

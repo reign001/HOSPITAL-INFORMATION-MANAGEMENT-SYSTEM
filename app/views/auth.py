@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models import db, User
-
+from werkzeug.security import generate_password_hash
 from flask import Blueprint
 
 
@@ -58,34 +58,88 @@ from app.models import User
 from app.views.auth import auth_bp
 
 
-# List all admins/superadmins
+# ==============================
+# View & Manage Admins
+# ==============================
 @auth_bp.route("/manage_admins")
 def manage_admins():
-    admins = User.query.filter(User.role.in_(["admin", "super_admin"])).all()
+    admins = User.query.filter(User.role.in_([
+        "admin", "super_admin",
+        "Nursing_Admin", "Doctor_Admin", "Record_Admin",
+        "Pharmacy_Admin", "Finance_Admin"
+    ])).all()
+
     return render_template("auth/manage_admins.html", admins=admins)
 
 
-# Add a new admin or superadmin
+# ==============================
+# Add Admin
+# ==============================
 @auth_bp.route("/add_admin", methods=["GET", "POST"])
 def add_admin():
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = request.form.get("username").strip()
+        password = request.form.get("password").strip()
         role = request.form.get("role")
 
         if User.query.filter_by(username=username).first():
-            flash("⚠️ Username already exists!", "danger")
+            flash("⚠️ Username already exists. Try another.", "warning")
             return redirect(url_for("auth.add_admin"))
 
-        new_user = User(username=username, role=role)
-        new_user.set_password(password)
-        db.session.add(new_user)
+        hashed_pw = generate_password_hash(password)
+        new_admin = User(username=username, password_hash=hashed_pw, role=role)
+        db.session.add(new_admin)
         db.session.commit()
-        flash(f"✅ {role.capitalize()} '{username}' created successfully!", "success")
+
+        flash(f"✅ Admin '{username}' ({role}) created successfully!", "success")
         return redirect(url_for("auth.manage_admins"))
 
     return render_template("auth/add_admin.html")
 
+
+
+# ==============================
+# Reset Admin Account
+# ==============================
+@auth_bp.route("/reset_admin/<int:user_id>", methods=["GET", "POST"])
+def reset_admin(user_id):
+    user = User.query.get_or_404(user_id)
+
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username and username.strip() != "":
+            existing = User.query.filter_by(username=username).first()
+            if existing and existing.id != user.id:
+                flash("⚠️ Username already taken.", "warning")
+                return redirect(url_for("auth.reset_admin", user_id=user.id))
+            user.username = username.strip()
+
+        if password and password.strip() != "":
+            user.password_hash = generate_password_hash(password.strip())
+
+        db.session.commit()
+        flash(f"✅ Admin '{user.username}' updated successfully!", "success")
+        return redirect(url_for("auth.manage_admins"))
+
+    return render_template("auth/reset_admin.html", user=user)
+
+
+# ==============================
+# Delete Admin
+# ==============================
+@auth_bp.route("/delete_admin/<int:user_id>", methods=["POST"])
+def delete_admin(user_id):
+    admin = User.query.get_or_404(user_id)
+    if admin.role == "super_admin":
+        flash("⚠️ You cannot delete a Super Admin!", "danger")
+        return redirect(url_for("auth.manage_admins"))
+
+    db.session.delete(admin)
+    db.session.commit()
+    flash(f"🗑️ Admin '{admin.username}' deleted successfully.", "info")
+    return redirect(url_for("auth.manage_admins"))
 
 # Reset admin/superadmin password
 @auth_bp.route("/reset_superadmin", methods=["GET", "POST"])
@@ -104,7 +158,6 @@ def reset_superadmin():
 
 
 @auth_bp.route('/list_users')
-@login_required
 def list_users():
     users = User.query.all()
     return render_template("auth/list_users.html", users=users)

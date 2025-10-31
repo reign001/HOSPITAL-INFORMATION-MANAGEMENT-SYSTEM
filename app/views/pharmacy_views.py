@@ -1,15 +1,33 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
-from app.models import db, Drug, DispenseRecord, Patient
+from app.models import db, Drug, Prescription, Patient
 from datetime import datetime
 from flask_login import login_required, current_user
 from decorators import role_required
 
 pharmacy_bp = Blueprint("pharmacy", __name__, url_prefix="/pharmacy")
 
+
+@pharmacy_bp.route("/dashboard")
+@login_required
+def dashboard():
+    # Access control
+    if current_user.role not in ["admin", "super_admin", "pharmacy_admin"]:
+        abort(403)
+
+    # Retrieve all patients that have prescriptions or documentation
+    patients = (
+        Patient.query
+        .join(Prescription, Prescription.patient_id == Patient.id)
+        .distinct()
+        .all()
+    )
+
+    return render_template("pharmacy/pharmacy_dashboard.html", patients=patients)
+
 # List all drugs
 
-@pharmacy_bp.route("/")
-@login_required
+@pharmacy_bp.route("/", methods=["GET", "POST"])
+# @login_required
 def list_drugs():
     if not current_user.is_authenticated:
         abort(403)
@@ -18,6 +36,28 @@ def list_drugs():
 
     drugs = Drug.query.all()
     return render_template("pharmacy/list.html", drugs=drugs)
+
+@pharmacy_bp.route("/view_prescription/<int:patient_id>")
+@login_required
+def view_prescription(patient_id):
+    """View all prescriptions for a specific patient (for pharmacist to dispense)."""
+    if current_user.role not in ["pharmacist", "admin", "super_admin"]:
+        abort(403)
+
+    patient = Patient.query.get_or_404(patient_id)
+
+    # Fetch prescriptions written by doctors/nurses for this patient
+    prescriptions = Prescription.query.filter_by(patient_id=patient_id).all()
+
+    # Fetch related documentation (doctor/nurse notes)
+    documentations = Prescription.query.filter_by(patient_id=patient_id).all()
+
+    return render_template(
+        "doctor/prescription_form.html",
+        patient=patient,
+        prescriptions=prescriptions,
+        documentations=documentations
+    )
 
 # Add a new drug to inventory
 @pharmacy_bp.route("/add", methods=["GET", "POST"])
@@ -72,3 +112,23 @@ def delete_drug(drug_id):
     db.session.commit()
     flash(f"Drug '{drug.name}' ({drug.brand_name}) deleted from inventory.", "success")
     return redirect(url_for("pharmacy.list_drugs"))
+
+
+@pharmacy_bp.route("/view_documentation/<int:patient_id>")
+@login_required
+def view_documentation(patient_id):
+    """Allow pharmacist to view patient documentation from doctors and nurses."""
+    if current_user.role not in ["pharmacist", "admin", "super_admin"]:
+        abort(403)
+
+    # Fetch the patient
+    patient = Patient.query.get_or_404(patient_id)
+
+    # Get all documentation records (e.g., doctor's and nurse's notes)
+    documentations = Prescription.query.filter_by(patient_id=patient_id).order_by(Prescription.created_at.desc()).all()
+
+    return render_template(
+        "doctor/patient_card.html",
+        patient=patient,
+        documentations=documentations
+    )

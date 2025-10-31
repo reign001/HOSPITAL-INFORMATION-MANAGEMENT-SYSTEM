@@ -9,8 +9,20 @@ patient_bp = Blueprint("patients", __name__, template_folder="../templates/patie
 # # LIST ALL
 @patient_bp.route("/")
 def list_patients():
-    patients = Patient.query.all()
-    return render_template("patients/list.html", patients=patients)
+    query = request.args.get("q", "").strip()
+    if query:
+        patients = Patient.query.filter(
+            (Patient.first_name.ilike(f"%{query}%")) |
+            (Patient.surname.ilike(f"%{query}%")) |
+            (Patient.hospital_number.ilike(f"%{query}%"))|
+            (Patient.phone_number.ilike(f"%{query}%"))|
+            (Patient.address.ilike(f"%{query}%"))
+        ).all()
+    else:
+        patients = Patient.query.all()
+    return render_template("patients/list.html", patients=patients, query=query)
+
+
 
 # # DETAIL
 @patient_bp.route("/<int:patient_id>")

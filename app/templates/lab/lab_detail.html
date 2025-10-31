@@ -8,6 +8,9 @@
         <h3 style="font-weight:700; font-size:1.9rem; color:#1976d2;">
             🧪 Lab Visit Details
         </h3>
+        <div style="flex:1 1 45%; min-width:250px;">
+            <p><strong>Date:</strong> {{ visit.created_at.strftime("%Y-%m-%d %H:%M") }}</p>
+        </div>
     </div>
 
     <!-- Patient Info Rows -->
@@ -27,9 +30,6 @@
             <p><strong>NHIS Status:</strong> {{ visit.nhis_status }}</p>
         </div>
         <div style="flex:1 1 30%; min-width:150px;">
-            <p><strong>Patient Type:</strong> {{ visit.inpatient_status }}</p>
-        </div>
-        <div style="flex:1 1 30%; min-width:150px;">
             <p><strong>Phone:</strong> {{ visit.phone_number }}</p>
         </div>
 
@@ -46,16 +46,23 @@
         <div style="flex:1 1 45%; min-width:250px;">
             <p><strong>Investigations:</strong> {{ visit.investigations }}</p>
         </div>
-
+        <div style="flex:1 1 45%; min-width:250px;">
+            {% if visit.result %}
+                <div class="alert alert-success">
+                    <strong>Result:</strong> {{ visit.result }}
+                </div>
+            {% else %}
+                <div class="alert alert-warning">
+                    Result pending...
+                </div>
+            {% endif %}
+        </div>
         <div style="flex:1 1 45%; min-width:250px;">
             <p><strong>Amount Paid:</strong> 
                 <span style="display:inline-block; background:#4caf50; color:#fff; padding:5px 12px; border-radius:8px; font-weight:600;">
                     ₦{{ visit.amount_paid }}
                 </span>
             </p>
-        </div>
-        <div style="flex:1 1 45%; min-width:250px;">
-            <p><strong>Date:</strong> {{ visit.created_at.strftime("%Y-%m-%d %H:%M") }}</p>
         </div>
 
     </div>
