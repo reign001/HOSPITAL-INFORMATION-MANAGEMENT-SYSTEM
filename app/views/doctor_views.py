@@ -50,18 +50,22 @@ def dashboard():
 def update_patient_card(patient_id):
     patient = Patient.query.get_or_404(patient_id)
     card = PatientCard.query.filter_by(patient_id=patient.id).first()
+
+    # Ensure card exists in DB
     if not card:
         card = PatientCard(patient_id=patient.id)
+        db.session.add(card)
+        db.session.commit()
 
     if request.method == "POST":
         notes = request.form.get("notes")
         card.notes = notes
-        db.session.add(card)
         db.session.commit()
         flash("Patient card updated", "success")
         return redirect(url_for("doctor.dashboard"))
 
     return render_template("doctor/patient_card.html", patient=patient, card=card)
+
 
 
 @doctor_bp.route("/doctor/patient/<int:patient_id>/prescription", methods=["GET", "POST"])

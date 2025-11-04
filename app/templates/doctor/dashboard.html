@@ -144,7 +144,7 @@
             </a>
 
             {% if visit and request %}
-                <a href="{{ url_for('lab.lab_detail', visit_id=visit.id, request_id=request.id) }}" class="btn btn-primary btn-sm">
+                <a href="{{ url_for('lab.lab_detail', visit_id=visit.id, request_id=request.id) }}" class="btn btn-primary btn-sm" style="background-color: grey;">
                     🧪 View Lab Details
                 </a>
             {% else %}

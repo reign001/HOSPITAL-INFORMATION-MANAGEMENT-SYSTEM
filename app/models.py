@@ -39,7 +39,7 @@ class SexEnum(enum.Enum):
 
 class NHISStatus(Enum):
     NHIS = "NHIS"
-    NON_NHIS = "NON_NHIS"
+    NON_NHIS = "NON-NHIS"
 
 
 # --------------------------

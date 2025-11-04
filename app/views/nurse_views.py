@@ -69,18 +69,20 @@ def view_prescription(patient_id):
     prescription = Prescription.query.filter_by(patient_id=patient.id).order_by(Prescription.created_at.desc()).first()
 
     if not prescription:
-        flash("No prescription found for this patient yet.", "warning")
+        flash("⚠️ No prescription found for this patient yet.", "warning")
         return redirect(url_for("nurse.dashboard"))
 
-    return render_template("doctor/prescription_form.html", patient=patient, prescription=prescription)
-
+    return render_template(
+        "nurse/view_prescription.html",  # separate template for nurses
+        patient=patient,
+        prescription=prescription
+    )
 
 
 # -----------------------------
 # View or Update Patient Folder (Read/Write)
 # -----------------------------
 @nurse_bp.route("/patient/<int:patient_id>/card", methods=["GET", "POST"])
-@login_required
 def update_patient_card(patient_id):
     patient = Patient.query.get_or_404(patient_id)
     card = PatientCard.query.filter_by(patient_id=patient.id).first()
@@ -102,18 +104,28 @@ def update_patient_card(patient_id):
 
 # --- View/Update Patient Folder ---
 @nurse_bp.route("/folder/<int:patient_id>", methods=["GET", "POST"])
-# @login_required
-# @nurse_required
+@login_required
 def patient_folder(patient_id):
     patient = Patient.query.get_or_404(patient_id)
 
+    # Always make sure the patient has a card
+    card = PatientCard.query.filter_by(patient_id=patient.id).first()
+    if not card:
+        card = PatientCard(patient_id=patient.id)
+        db.session.add(card)
+        db.session.commit()
+
     if request.method == "POST":
-        note = request.form.get("note")
+        note = request.form.get("note") or request.form.get("notes")  # handle either field name
         if note:
-            patient.notes = note
+            card.notes = note  # <-- write to PatientCard.notes, not Patient.notes
             db.session.commit()
-            flash("Patient folder updated successfully!", "success")
-    return render_template("doctor/patient_card.html", patient=patient)
+            flash("✅ Patient folder updated successfully!", "success")
+        else:
+            flash("⚠️ No note entered!", "warning")
+
+    return render_template("doctor/patient_card.html", patient=patient, card=card)
+
 
 
 # --- Medication Administration Chart ---
