@@ -1,0 +1,31 @@
+{% for emp in employees %}
+<tr>
+  <td>{{ emp.full_name() }}</td>
+  <td>{{ emp.email }}</td>
+  <td>{{ emp.role.name }}</td>
+  <td>{{ emp.department or '—' }}</td>
+  <td>{{ emp.shift.value }}</td>
+  <td>
+    <span class="badge {{ 'bg-success' if emp.is_active else 'bg-danger' }}">
+      {{ "Active" if emp.is_active else "Inactive" }}
+    </span>
+  </td>
+  <td>
+    <a href="{{ url_for('admin.edit_employee', employee_id=emp.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+    <form action="{{ url_for('admin.delete_employee', employee_id=emp.id) }}" method="POST" style="display:inline;">
+      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+
+{% if employees_pag.has_next %}
+<tr id="loadMoreRow">
+  <td colspan="7" class="text-center py-3">
+    <button id="loadMoreBtn" class="btn btn-outline-primary btn-sm" data-page="{{ employees_pag.next_num }}">
+      Load More ({{ employees_pag.total - (employees_pag.page * employees_pag.per_page) }} left)
+    </button>
+    <div id="loading" class="spinner-border spinner-border-sm ms-2 d-none"></div>
+  </td>
+</tr>
+{% endif %}

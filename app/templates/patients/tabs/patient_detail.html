@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="mb-0">{{ patient.full_name() }}</h3>
+      <p class="text-muted">Hospital No: {{ patient.hospital_number }}</p>
+      <hr>
+
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Age:</strong> {{ patient.calculate_age() }}</p>
+          <p><strong>Sex:</strong> {{ patient.sex.value }}</p>
+          <p><strong>Phone:</strong> {{ patient.phone_number }}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Address:</strong> {{ patient.address }}</p>
+          <p><strong>NHIS Status:</strong> {{ patient.nhis_status.value }}</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <ul class="nav nav-tabs" id="emrTabs" role="tablist">
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#medical">Medical History</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#family">Family History</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#social">Social History</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#allergy">Allergies</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#vitals">Vitals</a></li>
+      </ul>
+
+      <div class="tab-content pt-3">
+        <div class="tab-pane fade show active" id="medical">
+          {% include "patients/tabs/medical_history.html" %}
+        </div>
+        <div class="tab-pane fade" id="family">
+          {% include "patients/tabs/family_history.html" %}
+        </div>
+        <div class="tab-pane fade" id="social">
+          {% include "patients/tabs/social_history.html" %}
+        </div>
+        <div class="tab-pane fade" id="allergy">
+          {% include "patients/tabs/allergies.html" %}
+        </div>
+        <div class="tab-pane fade" id="vitals">
+          {% include "patients/tabs/vitals.html" %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

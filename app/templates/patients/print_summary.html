@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ patient.full_name() }} - Medical Summary</title>
+    <style>
+        body {
+            font-family: "Helvetica", Arial, sans-serif;
+            margin: 40px;
+            font-size: 12pt;
+            color: #222;
+        }
+        h1, h2, h3 {
+            color: #004080;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+        }
+        .section {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+        table, th, td {
+            border: 1px solid #aaa;
+        }
+        th, td {
+            padding: 6px;
+            text-align: left;
+        }
+        .small {
+            font-size: 10pt;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Patient Summary Report</h1>
+
+<h2>Patient Information</h2>
+<p><strong>Name:</strong> {{ patient.full_name() }}</p>
+<p><strong>Hospital Number:</strong> {{ patient.hospital_number }}</p>
+<p><strong>Age:</strong> {{ patient.age }}</p>
+<p><strong>Sex:</strong> {{ patient.sex.value if patient.sex else "—" }}</p>
+<p><strong>Phone:</strong> {{ patient.phone_number or "—" }}</p>
+
+<!-- MEDICAL HISTORY -->
+<div class="section">
+    <h2>🩺 Medical History</h2>
+    {% if patient.medical_history %}
+        <p>{{ patient.medical_history }}</p>
+    {% else %}
+        <p>No medical history recorded.</p>
+    {% endif %}
+</div>
+
+<!-- FAMILY HISTORY -->
+<div class="section">
+    <h2>👨‍👩‍👧‍👦 Family History</h2>
+    {% if family_history %}
+        <p><strong>Details:</strong> {{ family_history.details or "—" }}</p>
+    {% else %}
+        <p>No family history recorded.</p>
+    {% endif %}
+</div>
+
+<!-- SOCIAL HISTORY -->
+<div class="section">
+    <h2>🏡 Social History</h2>
+    {% if social_history %}
+        <p><strong>Occupation:</strong> {{ social_history.occupation or "—" }}</p>
+        <p><strong>Marital Status:</strong> {{ social_history.marital_status or "—" }}</p>
+        <p><strong>Lifestyle Habits:</strong> {{ social_history.lifestyle or "—" }}</p>
+    {% else %}
+        <p>No social history recorded.</p>
+    {% endif %}
+</div>
+
+<!-- ALLERGIES -->
+<div class="section">
+    <h2>⚠️ Allergies</h2>
+    {% if allergies and allergies|length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Allergen</th>
+                    <th>Reaction</th>
+                    <th>Severity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for allergy in allergies %}
+                <tr>
+                    <td>{{ allergy.allergen or "—" }}</td>
+                    <td>{{ allergy.reaction or "—" }}</td>
+                    <td>{{ allergy.severity or "—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No allergies recorded.</p>
+    {% endif %}
+</div>
+
+<!-- IMMUNIZATION -->
+<div class="section">
+    <h2>💉 Immunization History</h2>
+    {% if immunizations and immunizations|length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Vaccine</th>
+                    <th>Date Given</th>
+                    <th>Given By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for imm in immunizations %}
+                <tr>
+                    <td>{{ imm.vaccine_name or "—" }}</td>
+                    <td>{{ imm.date_given.strftime('%b %d, %Y') if imm.date_given else "—" }}</td>
+                    <td>{{ imm.given_by or "—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No immunization records found.</p>
+    {% endif %}
+</div>
+
+<!-- VITAL SIGNS -->
+<div class="section">
+    <h2>🫀 Vital Signs</h2>
+    {% if vitals and vitals|length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Blood Pressure</th>
+                    <th>Heart Rate</th>
+                    <th>Resp. Rate</th>
+                    <th>Temperature (°C)</th>
+                    <th>Weight (kg)</th>
+                    <th>Recorded By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in vitals %}
+                <tr>
+                    <td>{{ v.date_recorded.strftime('%b %d, %Y %I:%M %p') if v.date_recorded else "—" }}</td>
+                    <td>{{ v.blood_pressure or "—" }}</td>
+                    <td>{{ v.heart_rate or "—" }}</td>
+                    <td>{{ v.respiratory_rate or "—" }}</td>
+                    <td>{{ v.temperature or "—" }}</td>
+                    <td>{{ v.weight or "—" }}</td>
+                    <td>{{ v.recorded_by or "—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No vital signs recorded.</p>
+    {% endif %}
+</div>
+
+<hr>
+<p class="small">Generated on {{ generated_on.strftime('%B %d, %Y at %I:%M %p') }}.</p>
+
+</body>
+</html>

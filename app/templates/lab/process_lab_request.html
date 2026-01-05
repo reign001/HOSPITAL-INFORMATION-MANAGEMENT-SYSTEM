@@ -120,15 +120,15 @@
 
     <!-- Patient Info Card -->
     <div class="patient-info mb-4">
-      <p><strong>Patient:</strong> {{ request.patient.first_name }} {{ request.patient.surname }}</p>
-      <p><strong>Tests Requested:</strong> {{ request.tests_requested }}</p>
-      <p><strong>Requested By:</strong> {{ request.doctor.username if request.doctor else 'Unknown' }}</p>
+      <p><strong>Patient:</strong> {{ lab_request.patient.first_name }} {{ lab_request.patient.surname }}</p>
+      <p><strong>Tests Requested:</strong> {{ lab_request.tests_requested }}</p>
+      <p><strong>Requested By:</strong> {{ lab_request.doctor.username if request.doctor else 'Unknown' }}</p>
       <p><strong>Status:</strong> 
         <span class="badge 
-          {% if request.status == 'Pending' %}bg-warning text-dark
-          {% elif request.status == 'Completed' %}bg-success
+          {% if lab_request.status == 'Pending' %}bg-warning text-dark
+          {% elif lab_request.status == 'Completed' %}bg-success
           {% else %}bg-secondary{% endif %}">
-          {{ request.status }}
+          {{ lab_request.status }}
         </span>
       </p>
     </div>
@@ -173,7 +173,7 @@
 
       <!-- Buttons -->
       <div class="d-flex justify-content-between">
-        <a href="{{ url_for('lab.lab_requests', patient_id=request.patient_id) }}" 
+        <a href="{{ url_for('lab.lab_requests', patient_id=lab_request.patient_id) }}" 
            class="btn btn-outline-secondary">
           ← Back
         </a>

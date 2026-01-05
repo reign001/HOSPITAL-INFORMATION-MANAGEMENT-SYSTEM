@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm p-4">
+    <h4>Update Social History for {{ patient.full_name() }}</h4>
+    <form method="POST">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="smoking" id="smoking"
+               {% if patient.social_history and patient.social_history.smoking %}checked{% endif %}>
+        <label class="form-check-label" for="smoking">Smokes Cigarettes or Tobacco</label>
+      </div>
+
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="alcohol" id="alcohol"
+               {% if patient.social_history and patient.social_history.alcohol %}checked{% endif %}>
+        <label class="form-check-label" for="alcohol">Consumes Alcohol</label>
+      </div>
+
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="drug_use" id="drug_use"
+               {% if patient.social_history and patient.social_history.drug_use %}checked{% endif %}>
+        <label class="form-check-label" for="drug_use">Uses Recreational Drugs</label>
+      </div>
+
+      <div class="mb-3 mt-3">
+        <label>Occupation</label>
+        <input type="text" name="occupation" class="form-control"
+               value="{{ patient.social_history.occupation if patient.social_history else '' }}">
+      </div>
+
+      <div class="mb-3">
+        <label>Marital Status</label>
+        <select name="marital_status" class="form-select">
+          <option value="">Select</option>
+          {% set status = patient.social_history.marital_status if patient.social_history else '' %}
+          {% for s in ['Single', 'Married', 'Divorced', 'Widowed'] %}
+            <option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label>Living Conditions</label>
+        <textarea name="living_conditions" class="form-control" rows="3">
+          {{ patient.social_history.living_conditions if patient.social_history else '' }}
+        </textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="{{ url_for('patients.patient_detail', patient_id=patient.id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

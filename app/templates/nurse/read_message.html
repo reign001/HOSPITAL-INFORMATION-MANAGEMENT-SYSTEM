@@ -1,0 +1,16 @@
+<h2>{{ msg.subject }}</h2>
+
+<p><strong>From:</strong> {{ msg.sender.first_name }} {{ msg.sender.surname }}</p>
+<p><strong>Received:</strong> {{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+
+<hr>
+
+<p>{{ msg.content }}</p>
+
+<hr>
+
+<a href="{{ url_for('nurse.reply_message', message_id=msg.id) }}" class="btn btn-success">
+    Reply
+</a>
+
+<a href="{{ url_for('nurse.inbox') }}" class="btn btn-secondary">Back to Inbox</a>

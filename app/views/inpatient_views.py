@@ -1,11 +1,13 @@
 
-from app.models import InPatientRecord
+# from app.modelsx import InPatientRecord
 from flask import jsonify
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from datetime import datetime
+from app.models.inpatient import InPatientRecord
 from sqlalchemy import func
 from app import db
-from app.models import InPatientRecord, Patient
+# from app.modelsx import InPatientRecord
+from app.models.patients import Patient
 from app.forms import InPatientForm
 from decorators import role_required
 

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Patient Card for {{ card.patient.full_name() }}</h2>
+<p><strong>Created At:</strong> {{ card.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+
+<h3>Vital Signs</h3>
+<ul>
+  <li>BP: {{ card.blood_pressure }}</li>
+  <li>HR: {{ card.heart_rate }}</li>
+  <li>RR: {{ card.respiratory_rate }}</li>
+  <li>Temp: {{ card.temperature }}</li>
+  <li>O₂ Sat: {{ card.oxygen_saturation }}</li>
+  <li>Weight: {{ card.weight }}</li>
+  <li>Height: {{ card.height }}</li>
+</ul>
+
+<h3>Clinical Details</h3>
+<ul>
+  <li>Chief Complaint: {{ card.chief_complaint }}</li>
+  <li>HPI: {{ card.history_of_present_illness }}</li>
+  <li>Past Medical History: {{ card.past_medical_history }}</li>
+  <li>Medications: {{ card.medications }}</li>
+  <li>Allergies: {{ card.allergies }}</li>
+  <li>Examination: {{ card.examination }}</li>
+  <li>Assessment: {{ card.assessment }}</li>
+  <li>Plan: {{ card.plan }}</li>
+</ul>
+
+<a href="{{ url_for('cards.edit_card', card_id=card.id) }}" class="btn edit-btn">Edit Card</a>
+<a href="{{ url_for('cards.list_cards', patient_id=card.patient.id) }}" class="btn back-btn">Back to Cards</a>
+{% endblock %}

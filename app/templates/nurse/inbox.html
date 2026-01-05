@@ -1,0 +1,31 @@
+<h2>Nurse Inbox</h2>
+
+<table class="table">
+    <tr>
+        <th>From</th>
+        <th>Subject</th>
+        <th>Received</th>
+        <th>Status</th>
+        <th></th>
+    </tr>
+
+    {% for msg in messages %}
+    <tr class="{% if not msg.is_read %}unread{% endif %}">
+        <td>{{ msg.sender.first_name }} {{ msg.sender.surname }}</td>
+        <td>{{ msg.subject }}</td>
+        <td>{{ msg.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>
+            {% if msg.is_read %}
+                <span class="text-success">Read</span>
+            {% else %}
+                <span class="text-danger">Unread</span>
+            {% endif %}
+        </td>
+        <td>
+            <a href="{{ url_for('nurse.read_message', message_id=msg.id) }}" class="btn btn-primary">
+                Open
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>

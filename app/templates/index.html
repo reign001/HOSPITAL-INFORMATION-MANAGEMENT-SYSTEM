@@ -41,13 +41,15 @@
 
             <!-- Laboratory -->
             <div class="col-md-3">
-
-                {% if latest_visit %}
-                <a href="{{ url_for('lab.lab_requests', patient_id=latest_visit.patient_id) }}" class="btn btn-warning w-100 py-3">
-                    View Lab Requests
-                </a>
+                {% if latest_lab_request %}
+                    <a href="{{ url_for('lab.lab_requests', patient_id=latest_lab_request.patient_id) }}" 
+                    class="btn btn-warning w-100 py-3">
+                        🔬 Go to Lab Requests
+                    </a>
                 {% else %}
-                <button class="btn btn-secondary w-100 py-3" disabled>No Lab Visits Found</button>
+                    <a class="btn btn-secondary w-100 py-3 disabled">
+                        🔬 No Lab Requests Yet
+                    </a>
                 {% endif %}
                 
             </div>
@@ -59,19 +61,6 @@
                 </a>
             </div>
 
-            <!-- Dispensary -->
-            <div class="col-md-3">
-                <a href="{{ url_for('pharmacy.dispense_drug') }}" class="btn btn-info w-100 py-3">
-                    Dispensary
-                </a>
-            </div>
-
-            <!-- Staff -->
-            <div class="col-md-3">
-                <a href="{{ url_for('staff.list_staff') }}" class="btn btn-dark w-100 py-3">
-                    Staff
-                </a>
-            </div>
 
             <!-- Finance -->
             <div class="col-md-3">
@@ -103,7 +92,7 @@
 
             <!-- Admin Login -->
             <div class="col-md-3">
-                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary w-100 py-3">
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary w-100 py-3">
                     Manage Admin
                 </a>
             </div>

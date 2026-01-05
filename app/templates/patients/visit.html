@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ patient.full_name() }} - Vitals{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+      <h3 class="mb-3">
+        🫀 Vital Signs for {{ patient.full_name() }}
+      </h3>
+      <p class="text-muted mb-4">
+        Hospital Number: <strong>{{ patient.hospital_number }}</strong> | Age: {{ patient.age }} | Sex: {{ patient.sex.value }}
+      </p>
+
+      <!-- Vitals Form -->
+      <form method="POST" class="mb-4">
+        {{ form.hidden_tag() }}
+        <div class="row g-3">
+          <div class="col-md-2">{{ form.blood_pressure.label }} {{ form.blood_pressure(class="form-control") }}</div>
+          <div class="col-md-2">{{ form.heart_rate.label }} {{ form.heart_rate(class="form-control") }}</div>
+          <div class="col-md-2">{{ form.respiratory_rate.label }} {{ form.respiratory_rate(class="form-control") }}</div>
+          <div class="col-md-2">{{ form.temperature.label }} {{ form.temperature(class="form-control") }}</div>
+          <div class="col-md-2">{{ form.weight.label }} {{ form.weight(class="form-control") }}</div>
+          <div class="col-md-2 d-flex align-items-end">
+            {{ form.submit(class="btn btn-primary w-100") }}
+          </div>
+        </div>
+      </form>
+
+      <!-- Vitals Table -->
+      <h5 class="mt-4">📋 Recorded Vitals</h5>
+      {% if vitals %}
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Date Recorded</th>
+              <th>Blood Pressure</th>
+              <th>Heart Rate</th>
+              <th>Respiratory Rate</th>
+              <th>Temperature (°C)</th>
+              <th>Weight (kg)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for v in vitals %}
+            <tr>
+              <td>{{ v.date_recorded.strftime("%Y-%m-%d %H:%M") }}</td>
+              <td>{{ v.blood_pressure }}</td>
+              <td>{{ v.heart_rate }}</td>
+              <td>{{ v.respiratory_rate }}</td>
+              <td>{{ v.temperature }}</td>
+              <td>{{ v.weight }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted">No vitals recorded yet.</p>
+      {% endif %}
+
+      <!-- Chart Section -->
+      <div class="mt-5">
+        <h5>📈 Vitals Trend</h5>
+        <canvas id="vitalsChart" height="120"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('vitalsChart');
+  const labels = {{ vitals|map(attribute='date_recorded')|list|tojson }};
+  const heartRates = {{ vitals|map(attribute='heart_rate')|list|tojson }};
+  const temperatures = {{ vitals|map(attribute='temperature')|list|tojson }};
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {

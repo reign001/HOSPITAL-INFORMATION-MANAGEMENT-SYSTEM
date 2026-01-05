@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="investigation-container">
+  <div class="header">
+    <h2>🧪 Request Investigation for {{ patient.full_name() }}</h2>
+    <p><strong>Hospital Number:</strong> {{ patient.hospital_number }}</p>
+  </div>
+
+  <form method="POST">
+    <div class="investigation-list">
+      {% for test in investigations %}
+      <div class="checkbox-item">
+        <input type="checkbox" name="investigations" value="{{ test }}" id="{{ test }}">
+        <label for="{{ test }}">{{ test }}</label>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="form-section">
+      <label>Other Investigations (if not listed)</label>
+      <input type="text" name="other_test" placeholder="Specify other tests here...">
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">💾 Save Request</button>
+      <a href="{{ url_for('doctor.clerk_patient', patient_id=patient.id) }}" class="btn btn-secondary">⬅ Back</a>
+    </div>
+  </form>
+</div>
+
+<style>
+.investigation-container {
+  max-width: 700px;
+  margin: 30px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.header {
+  margin-bottom: 20px;
+}
+.investigation-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+  margin-bottom: 20px;
+}
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.form-section {
+  margin-bottom: 20px;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.btn-primary {
+  background: #2563eb;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+.btn-secondary {
+  background: #e2e8f0;
+  color: #1e3a8a;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.btn-secondary:hover {
+  background: #cbd5e1;
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+<form method="POST" action="{{ url_for('doctor.send_message') }}" class="message-form">
+
+    <label for="receiver">Send To (Nurse)</label>
+    <select name="receiver_id" id="receiver" required>
+        <option value="">-- Select Nurse --</option>
+        {% for nurse in nurses %}
+            <option value="{{ nurse.id }}">
+                {{ nurse.first_name }} {{ nurse.surname }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label for="subject">Subject</label>
+    <input id="subject" type="text" name="subject" placeholder="Subject" required>
+
+    <label for="content">Message</label>
+    <textarea id="content" name="content" placeholder="Write your message..." required></textarea>
+
+    <button type="submit">Send Message</button>
+
+</form>

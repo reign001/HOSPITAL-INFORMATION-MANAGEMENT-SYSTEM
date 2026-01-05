@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from datetime import datetime
 from app import db
-from app.models import Delivery
+from app.models.delivery import Delivery
 from app.forms import *
 from decorators import role_required
 

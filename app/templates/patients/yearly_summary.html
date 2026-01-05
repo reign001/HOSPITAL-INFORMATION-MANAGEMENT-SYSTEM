@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Patient Summary for {{ year }}</h2>
+<table>
+  <tr><th>Hospital No.</th><th>Name</th><th>Registered On</th></tr>
+  {% for p in patients %}
+    <tr>
+      <td>{{ p.hospital_number }}</td>
+      <td>{{ p.full_name() }}</td>
+      <td>{{ p.created_at.strftime('%Y-%m-%d') }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="3">No patients found for {{ year }}.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

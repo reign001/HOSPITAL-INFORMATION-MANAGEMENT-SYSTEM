@@ -1,0 +1,14 @@
+<div class="card p-3 border-0 shadow-sm">
+  <div class="d-flex justify-content-between">
+    <h5>Medical History</h5>
+    <a href="{{ url_for('patients.update_history', patient_id=patient.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+  </div>
+  <hr>
+  {% if patient.medical_history %}
+    <p><strong>Chronic Conditions:</strong> {{ patient.medical_history.chronic_conditions or 'N/A' }}</p>
+    <p><strong>Past Surgeries:</strong> {{ patient.medical_history.past_surgeries or 'N/A' }}</p>
+    <p><strong>Medications:</strong> {{ patient.medical_history.current_medications or 'N/A' }}</p>
+  {% else %}
+    <p class="text-muted">No medical history recorded yet.</p>
+  {% endif %}
+</div>

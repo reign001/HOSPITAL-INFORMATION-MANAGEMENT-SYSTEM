@@ -1,6 +1,6 @@
 # fix_labvisit_patient_ids.py
 from app import create_app, db
-from app.models import LabVisit, Patient
+from app.modelsx import LabVisit, Patient
 from datetime import datetime
 
 app = create_app()

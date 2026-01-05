@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+  <h2>Edit Patient Record</h2>
+
+  <!-- Update Main Patient Info -->
+  <form method="POST">
+    <h3>Personal Information</h3>
+    <label>First Name</label>
+    <input type="text" name="first_name" value="{{ patient.first_name }}" required>
+
+    <label>Surname</label>
+    <input type="text" name="surname" value="{{ patient.surname }}" required>
+
+    <label>Other Names</label>
+    <input type="text" name="other_names" value="{{ patient.other_names }}">
+
+    <label>Date of Birth</label>
+    <input type="date" name="date_of_birth" value="{{ patient.date_of_birth.strftime('%Y-%m-%d') if patient.date_of_birth else '' }}" required>
+
+    <label>Sex</label>
+    <select name="sex" required>
+      <option value="MALE" {% if patient.sex == 'MALE' %}selected{% endif %}>Male</option>
+      <option value="FEMALE" {% if patient.sex == 'FEMALE' %}selected{% endif %}>Female</option>
+    </select>
+
+    <label>Marital Status</label>
+    <select name="marital_status">
+      <option value="">-- Select --</option>
+      <option value="Single" {% if patient.marital_status == "Single" %}selected{% endif %}>Single</option>
+      <option value="Married" {% if patient.marital_status == "Married" %}selected{% endif %}>Married</option>
+      <option value="Divorced" {% if patient.marital_status == "Divorced" %}selected{% endif %}>Divorced</option>
+      <option value="Widowed" {% if patient.marital_status == "Widowed" %}selected{% endif %}>Widowed</option>
+    </select>
+
+    <label>Occupation</label>
+    <input type="text" name="occupation" value="{{ patient.occupation }}">
+
+    <label>Religion</label>
+    <input type="text" name="religion" value="{{ patient.religion }}">
+
+    <h3>Contact Information</h3>
+    <label>Address</label>
+    <input type="text" name="address" value="{{ patient.address }}" required>
+
+    <label>Phone Number</label>
+    <input type="text" name="phone_number" value="{{ patient.phone_number }}" required>
+
+    <label>Email</label>
+    <input type="email" name="email" value="{{ patient.email }}">
+
+    <h3>Next of Kin Information</h3>
+    <label>Next of Kin Name</label>
+    <input type="text" name="next_of_kin_name" value="{{ patient.next_of_kin_name }}">
+
+    <label>Next of Kin Phone</label>
+    <input type="text" name="next_of_kin_phone" value="{{ patient.next_of_kin_phone }}">
+
+    <label>Relationship</label>
+    <input type="text" name="next_of_kin_relationship" value="{{ patient.next_of_kin_relationship }}">
+
+    <h3>NHIS Information</h3>
+    <label>NHIS Status</label>
+    <select name="nhis_status" required>
+      <option value="NHIS" {% if patient.nhis_status == 'NHIS' %}selected{% endif %}>NHIS</option>
+      <option value="NON_NHIS" {% if patient.nhis_status == 'NON_NHIS' %}selected{% endif %}>Non-NHIS</option>
+    </select>
+
+    <div class="button-group">
+      <button type="submit" class="btn save-btn">💾 Save Changes</button>
+      <a href="{{ url_for('patients.patient_detail', patient_id=patient.id) }}" class="btn cancel-btn">Cancel</a>
+    </div>
+  </form>
+
+  <hr>
+
+  <!-- Additional Patient Records -->
+  <h3>🩺 Nurse Actions</h3>
+  <p>Record or update additional patient data below:</p>
+
+  <div class="nurse-actions">
+    <a href="{{ url_for('patients.update_family_history', patient_id=patient.id) }}" class="btn action-btn">👪 Family History</a>
+    <a href="{{ url_for('patients.update_social_history', patient_id=patient.id) }}" class="btn action-btn">🏡 Social History</a>
+    <a href="{{ url_for('patients.vitals', patient_id=patient.id) }}" class="btn action-btn">❤️ Vital Signs</a>
+    <a href="{{ url_for('patients.immunizations', patient_id=patient.id) }}" class="btn action-btn">💉 Immunization</a>
+    <a href="{{ url_for('patients.allergies', patient_id=patient.id) }}" class="btn action-btn">⚠️ Allergies</a>
+    <a href="{{ url_for('patients.update_medical_history', patient_id=patient.id) }}" class="btn action-btn">🩸 Medical History</a>
+  </div>
+</div>
+
+<style>
+.form-container {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-width: 800px;
+  margin: auto;
+}
+label {
+  font-weight: 600;
+  margin-top: 10px;
+  display: block;
+}
+input, select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+.btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  transition: 0.2s;
+}
+.save-btn { background: #4CAF50; }
+.cancel-btn { background: #9E9E9E; }
+.action-btn {
+  background: #1976D2;
+  margin: 6px 5px;
+}
+.action-btn:hover { background: #125a9c; }
+.nurse-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+</style>
+{% endblock %}

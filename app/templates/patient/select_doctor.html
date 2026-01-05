@@ -1,0 +1,26 @@
+{% extends "layouts/patient_base.html" %}
+{% block content %}
+<div class="container mt-4">
+
+    <h3 class="mb-3">👨‍⚕️ Select a Doctor</h3>
+
+    <div class="row">
+        {% for doctor in doctors %}
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ doctor.full_name() }}</h5>
+                    <p class="card-text">
+                        <strong>Dept:</strong> {{ doctor.department or "N/A" }} <br>
+                        <strong>Email:</strong> {{ doctor.email }}
+                    </p>
+                    <a href="{{ url_for('patient_chat.chat', doctor_id=doctor.id) }}" 
+                       class="btn btn-primary w-100">Start Chat</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

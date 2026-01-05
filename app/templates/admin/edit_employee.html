@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>✏️ Edit Employee</h2>
+
+<form method="POST">
+  <div class="form-section">
+    <label>First Name</label>
+    <input type="text" name="first_name" value="{{ employee.first_name }}" required>
+  </div>
+
+  <div class="form-section">
+    <label>Surname</label>
+    <input type="text" name="surname" value="{{ employee.surname }}" required>
+  </div>
+
+  <div class="form-section">
+    <label>Email</label>
+    <input type="email" name="email" value="{{ employee.email }}" required>
+  </div>
+
+  <div class="form-section">
+    <label>Role</label>
+    <select name="role_id" required>
+      {% for role in roles %}
+        <option value="{{ role.id }}" {% if employee.role_id == role.id %}selected{% endif %}>{{ role.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="form-section">
+    <label>Department</label>
+    <input type="text" name="department" value="{{ employee.department }}">
+  </div>
+
+  <div class="form-section">
+    <label>License Number</label>
+    <input type="text" name="license_number" value="{{ employee.license_number }}">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Update Employee</button>
+</form>
+
+<style>
+form { max-width: 600px; margin: 20px auto; }
+.form-section { margin-bottom: 15px; }
+label { display: block; font-weight: bold; margin-bottom: 5px; }
+input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
+.btn-primary { background: #2563eb; color: white; border: none; padding: 10px 15px; cursor: pointer; }
+.btn-primary:hover { background: #1d4ed8; }
+</style>
+{% endblock %}

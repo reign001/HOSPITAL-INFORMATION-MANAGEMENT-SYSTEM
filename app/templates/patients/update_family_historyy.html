@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+  <h2>👨‍👩‍👧 Family Medical History for {{ patient.full_name() }}</h2>
+
+  <form method="POST">
+    <div class="checkbox-grid">
+      {% set fh = patient.family_history %}
+      <label><input type="checkbox" name="hypertension" {% if fh and fh.hypertension %}checked{% endif %}> Hypertension</label>
+      <label><input type="checkbox" name="diabetes" {% if fh and fh.diabetes %}checked{% endif %}> Diabetes</label>
+      <label><input type="checkbox" name="cancer" {% if fh and fh.cancer %}checked{% endif %}> Cancer</label>
+      <label><input type="checkbox" name="heart_disease" {% if fh and fh.heart_disease %}checked{% endif %}> Heart Disease</label>
+      <label><input type="checkbox" name="stroke" {% if fh and fh.stroke %}checked{% endif %}> Stroke</label>
+      <label><input type="checkbox" name="sickle_cell" {% if fh and fh.sickle_cell %}checked{% endif %}> Sickle Cell</label>
+      <label><input type="checkbox" name="tuberculosis" {% if fh and fh.tuberculosis %}checked{% endif %}> Tuberculosis</label>
+      <label><input type="checkbox" name="asthma" {% if fh and fh.asthma %}checked{% endif %}> Asthma</label>
+      <label><input type="checkbox" name="mental_illness" {% if fh and fh.mental_illness %}checked{% endif %}> Mental Illness</label>
+    </div>
+
+    <label>Other Conditions</label>
+    <textarea name="other_conditions" rows="3">{{ fh.other_conditions if fh else '' }}</textarea>
+
+    <div class="button-group">
+      <button type="submit" class="btn save-btn">💾 Save</button>
+      <a href="{{ url_for('patients.patient_detail', patient_id=patient.id) }}" class="btn cancel-btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<style>
+.form-container {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-width: 700px;
+  margin: auto;
+}
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 20px;
+  margin-bottom: 1rem;
+}
+label {
+  font-weight: 600;
+}
+textarea {
+  width: 100%;
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+}
+.btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  transition: 0.2s;
+}
+.save-btn { background: #4CAF50; }
+.cancel-btn { background: #9E9E9E; }
+</style>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "layouts/doctor_base.html" %}
+
+{% block content %}
+<div class="container mt-3">
+    <h3>Chat with Patient ID: {{ patient_id }}</h3>
+
+    <!-- Chat messages -->
+    <div id="chatBox" class="border rounded p-3 mb-3" style="height: 450px; overflow-y: scroll; background:#f8f9fa;">
+    </div>
+
+    <!-- Send message -->
+    <form id="sendForm">
+        <div class="input-group">
+            <input id="msgInput" class="form-control" placeholder="Type message..." required>
+            <button class="btn btn-primary">Send</button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    function loadMessages() {
+        fetch("{{ url_for('doctor.get_patient_messages', patient_id=patient_id) }}")
+        .then(r => r.json())
+        .then(data => {
+            let box = document.getElementById("chatBox");
+            box.innerHTML = "";
+
+            data.messages.forEach(m => {
+                let isDoctor = m.sender === 'doctor';
+                let row = `
+                <div class="d-flex mb-2 ${isDoctor ? 'justify-content-end' : 'justify-content-start'}">
+                    <div class="p-2 rounded ${isDoctor ? 'bg-primary text-white' : 'bg-light'}" style="max-width:70%;">
+                        ${m.content}<br>
+                        <small class="text-muted">${m.timestamp}</small>
+                    </div>
+                </div>`;
+                box.innerHTML += row;
+            });
+
+            box.scrollTop = box.scrollHeight;
+        })
+        .catch(err => console.error("Error loading messages:", err));
+    }
+
+    // auto-refresh chat every 1.5s
+    setInterval(loadMessages, 1500);
+    loadMessages();
+
+    // send message
+    document.getElementById("sendForm").addEventListener("submit", function(e){
+        e.preventDefault();
+
+        let text = document.getElementById("msgInput").value.trim();
+        if (!text) return;
+
+        fetch("{{ url_for('doctor.send_message_to_patient', patient_id=patient_id) }}", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({message: text})
+        })
+        .then(r => r.json())
+        .then(data => {
+            console.log("Message sent:", data);
+            document.getElementById("msgInput").value = "";
+            loadMessages();
+        })
+        .catch(err => console.error("Error sending message:", err));
+    });
+
+});
+</script>
+{%endblock%}

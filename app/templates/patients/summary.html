@@ -1,150 +1,471 @@
 {% extends "base.html" %}
+{% block title %}Patient – {{ patient.full_name() }}{% endblock %}
+
 {% block content %}
-<div class="yearly-summary-container">
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <!-- ==== Header ==== -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+      <div>
+        <h3 class="mb-0">
+          Patient Summary — {{ patient.full_name() }}
+          {% if patient.ward %}
+            <span class="badge bg-info text-dark ms-2 badge-ward">Ward: {{ patient.ward }}</span>
+          {% else %}
+            <small class="text-muted ms-2">(No ward assigned)</small>
+          {% endif %}
+        </h3>
+        <p class="text-muted mb-0">Hospital Number: <strong>{{ patient.hospital_number }}</strong></p>
+      </div>
 
-  <h2 class="summary-title">📊 Yearly Patient Summary</h2>
+      <div class="mt-3 mt-md-0 d-flex flex-wrap gap-2">
+        <!-- Submit to Nurse -->
+        <form method="POST" action="{{ url_for('patients.submit_to_nurse', patient_id=patient.id) }}" class="d-inline">
+          <button type="submit" class="btn btn-outline-primary btn-sm">
+            Submit Folder
+          </button>
+        </form>
 
-  {% if summary %}
-  <div class="table-wrapper">
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th>Year</th>
-          <th>Total Patients</th>
-          <th>View</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in summary %}
-        <tr>
-          <td>{{ row.year }}</td>
-          <td>{{ row.total }}</td>
-          <td>
-            <a href="{{ url_for('patients.patients_by_year', year=row.year) }}" class="btn view-btn">View</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        <!-- Queue to Doctor (Dropdown) -->
+        <div class="dropdown d-inline">
+          <button class="btn btn-outline-success btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+            Queue Folder
+          </button>
+          <ul class="dropdown-menu">
+            {% for doctor in doctors %}
+              <li>
+                <form method="POST" action="{{ url_for('patients.queue_to_doctor', patient_id=patient.id, doctor_id=doctor.id) }}" class="m-0">
+                  <button type="submit" class="dropdown-item">{{ doctor.full_name() }}</button>
+                </form>
+              </li>
+            {% else %}
+              <li><span class="dropdown-item text-muted">No doctors available.</span></li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Add Ward (inline) -->
+        <form method="POST" action="{{ url_for('patients.add_ward', patient_id=patient.id) }}" class="d-inline">
+          <div class="input-group input-group-sm" style="width:220px;">
+            <input type="text" name="ward_name" placeholder="Ward name…" class="form-control" required>
+            <button type="submit" class="btn btn-outline-info">Add</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==== Quick Navigation ==== -->
+    <div class="quick-links d-flex flex-wrap gap-2 mb-4">
+      {% set sections = [
+        ("basic-info","Basic Info"),
+        ("social-history","Social"),
+        ("family-history","Family"),
+        ("immunization","Immunization"),
+        ("vitals","Vitals"),
+        ("allergies","Allergies"),
+        ("lab-investigations","Investigations"),
+        ("diagnosis","Diagnosis"),
+        ("medications","Prescriptions")
+      ] %}
+      {% for id, label in sections %}
+        <a href="#{{ id }}" class="btn btn-outline-secondary btn-sm">{{ label }}</a>
+      {% endfor %}
+    </div>
+
+    <!-- ==== Date Search ==== -->
+    <form method="GET" action="{{ url_for('patients.patient_summary', patient_id=patient.id) }}" class="mb-4">
+      <div class="input-group" style="max-width:300px;">
+        <input type="date" name="visit_date" class="form-control" value="{{ request.args.get('visit_date','') }}">
+        <button type="submit" class="btn btn-outline-primary">Search by Date</button>
+      </div>
+    </form>
   </div>
-  {% else %}
-  <div class="no-data-alert">
-    No yearly patient records found.
-  </div>
-  {% endif %}
-
-  <a href="{{ url_for('patients.list_patients') }}" class="btn back-btn">⬅ Back to Patient List</a>
-
 </div>
 
-<style>
-/* Container */
-.yearly-summary-container {
-  padding: 40px 20px;
-  font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #f8f9fa, #ffffff);
-  min-height: 100vh;
-}
+{# ====================== SECTIONS ====================== #}
+{% macro section_card(id, title, edit_url=none) %}
+  <section class="card shadow-sm mb-4" id="{{ id }}">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">{{ title }}</h5>
+      {% if edit_url %}
+        <a href="{{ edit_url }}" class="btn btn-sm btn-outline-primary">Edit</a>
+      {% endif %}
+    </div>
+    <div class="card-body">
+{% endmacro %}
 
-/* Title */
-.summary-title {
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 25px;
-  color: #333;
-}
+{% macro end_section() %}
+    </div></section>
+{% endmacro %}
 
-/* Table Wrapper */
-.table-wrapper {
-  overflow-x: auto;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-  margin-bottom: 20px;
-}
+{{ section_card('basic-info', 'Basic Information',
+                url_for('patients.update_patient', patient_id=patient.id)) }}
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><strong>Name:</strong> {{ patient.full_name() }}</li>
+    <li class="list-group-item"><strong>Sex:</strong> {{ patient.sex.value }}</li>
+    <li class="list-group-item"><strong>DOB:</strong> {{ patient.date_of_birth.strftime('%b %d, %Y') if patient.date_of_birth else "—" }}</li>
+    <li class="list-group-item"><strong>Phone:</strong> {{ patient.phone_number }}</li>
+    <li class="list-group-item"><strong>Email:</strong> {{ patient.email or "—" }}</li>
+    <li class="list-group-item"><strong>Address:</strong> {{ patient.address or "—" }}</li>
+    <li class="list-group-item"><strong>Religion:</strong> {{ patient.religion or "—" }}</li>
+    <li class="list-group-item"><strong>NHIS:</strong> {{ patient.nhis_status or "—" }}</li>
+  </ul>
+{{ end_section() }}
 
-/* Table Styling */
-.summary-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  min-width: 500px;
-}
+{{ section_card('social-history', 'Social History',
+                url_for('patients.update_social_history', patient_id=patient.id)) }}
+  {% if social_history %}
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead class="table-light"><tr>
+          <th>Occupation</th><th>Marital</th><th>Alcohol</th><th>Smoking</th><th>Drug Use</th><th>Living</th>
+        </tr></thead>
+        <tbody><tr>
+          <td>{{ social_history.occupation or "—" }}</td>
+          <td>{{ social_history.marital_status or "—" }}</td>
+          <td>{{ "Yes" if social_history.alcohol else "No" }}</td>
+          <td>{{ "Yes" if social_history.smoking else "No" }}</td>
+          <td>{{ "Yes" if social_history.drug_use else "No" }}</td>
+          <td>{{ social_history.living_conditions or "—" }}</td>
+        </tr></tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No social history recorded.</p>
+  {% endif %}
+{{ end_section() }}
 
-.summary-table thead {
-  background-color: #0288d1;
-  color: #fff;
-  text-align: center;
-}
+{{ section_card('family-history', 'Family History',
+                url_for('patients.family_history', patient_id=patient.id)) }}
+  {% if family_history %}
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead class="table-light"><tr>
+          <th>Diabetes</th><th>HTN</th><th>Cancer</th><th>Heart</th><th>Sickle</th>
+          <th>TB</th><th>Asthma</th><th>Stroke</th><th>Mental</th><th>Other</th>
+        </tr></thead>
+        <tbody><tr>
+          <td>{{ "Yes" if family_history.diabetes else "No" }}</td>
+          <td>{{ "Yes" if family_history.hypertension else "No" }}</td>
+          <td>{{ "Yes" if family_history.cancer else "No" }}</td>
+          <td>{{ "Yes" if family_history.heart_disease else "No" }}</td>
+          <td>{{ "Yes" if family_history.sickle_cell else "No" }}</td>
+          <td>{{ "Yes" if family_history.tuberculosis else "No" }}</td>
+          <td>{{ "Yes" if family_history.asthma else "No" }}</td>
+          <td>{{ "Yes" if family_history.stroke else "No" }}</td>
+          <td>{{ "Yes" if family_history.mental_illness else "No" }}</td>
+          <td>{{ family_history.other_conditions or "—" }}</td>
+        </tr></tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No family history recorded.</p>
+  {% endif %}
+{{ end_section() }}
 
-.summary-table th,
-.summary-table td {
-  padding: 12px 15px;
-  font-size: 0.95rem;
-  text-align: center;
-}
+{{ section_card('immunization', 'Immunization History',
+                url_for('patients.immunizations', patient_id=patient.id)) }}
+  {% if immunizations %}
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead class="table-light"><tr><th>Vaccine</th><th>Date</th><th>Next Due</th><th>By</th></tr></thead>
+        <tbody>
+          {% for i in immunizations %}
+            <tr>
+              <td>{{ i.vaccine_name }}</td>
+              <td>{{ i.date_administered.strftime('%b %d, %Y') if i.date_administered else "—" }}</td>
+              <td>{{ i.next_due_date.strftime('%b %d, %Y') if i.next_due_date else "—" }}</td>
+              <td>{{ i.administered_by or "—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No immunization record found.</p>
+  {% endif %}
+{{ end_section() }}
 
-.summary-table tbody tr {
-  background-color: #fff;
-  transition: background-color 0.2s ease;
-}
+{{ section_card('vitals', 'Vital Signs',
+                url_for('patients.vitals', patient_id=patient.id)) }}
+  {% if vitals %}
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead class="table-light"><tr>
+          <th>Date</th><th>BP</th><th>HR</th><th>Temp °C</th><th>RR</th><th>Weight kg</th><th>By</th>
+        </tr></thead>
+        <tbody>
+          {% for v in vitals %}
+            <tr>
+              <td>{{ v.date_recorded.strftime('%b %d, %Y %I:%M %p') if v.date_recorded else "—" }}</td>
+              <td>{{ v.blood_pressure or "—" }}</td>
+              <td>{{ v.heart_rate or "—" }}</td>
+              <td>{{ v.temperature or "—" }}</td>
+              <td>{{ v.respiratory_rate or "—" }}</td>
+              <td>{{ v.weight or "—" }}</td>
+              <td>{{ v.recorded_by or "—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No vital signs recorded.</p>
+  {% endif %}
+{{ end_section() }}
 
-.summary-table tbody tr:hover {
-  background-color: rgba(2,136,209,0.08);
-}
+{{ section_card('allergies', 'Allergies',
+                url_for('patients.allergies', patient_id=patient.id)) }}
+  {% if allergies %}
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead class="table-light"><tr><th>Allergen</th><th>Reaction</th><th>Severity</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for a in allergies %}
+            <tr>
+              <td>{{ a.allergen }}</td>
+              <td>{{ a.reaction or "—" }}</td>
+              <td>{{ a.severity }}</td>
+              <td>{{ a.date_identified.strftime('%b %d, %Y') if a.date_identified else "—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No allergy information recorded.</p>
+  {% endif %}
+{{ end_section() }}
 
-/* View Button */
-.view-btn {
-  background-color: #17a2b8;
-  color: #fff;
-  padding: 6px 12px;
-  font-size: 0.9rem;
-  border-radius: 6px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
+{{ section_card('lab-investigations', 'Laboratory Investigations') }}
+  {% if investigations %}
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead class="table-light"><tr>
+          <th>Requested</th><th>Tests</th><th>Status</th><th>Results</th><th>Verified By</th>
+        </tr></thead>
+        <tbody>
+          {% for inv in investigations %}
+            <tr>
+              <td>{{ inv.created_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+              <td>
+                {% for test in inv.tests_requested.split(',') %}
+                  <div>{{ test.strip() }}</div>
+                {% endfor %}
+              </td>
+              <td>{{ inv.status }}</td>
+              <td>
+                {% if inv.results %}
+                  <ul class="mb-0">
+                    {% for res in inv.results %}
+                      <li>
+                        <strong>{{ res.test_name }}:</strong> {{ res.result_value or "Pending" }}
+                        {% if res.normal_range %}<em>({{ res.normal_range }})</em>{% endif %}
+                        {% if res.comments %}<br><small>{{ res.comments }}</small>{% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <span class="text-muted">Pending</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if inv.results %}
+                  {% for res in inv.results %}
+                    <div>{{ res.verified_by or "—" }}</div>
+                  {% endfor %}
+                {% else %}—{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No investigations recorded.</p>
+  {% endif %}
+{{ end_section() }}
 
-.view-btn:hover {
-  background-color: #138496;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+{{ section_card('diagnosis', 'Diagnoses') }}
+  {% if diagnoses %}
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead class="table-light"><tr><th>Date</th><th>Diagnosis</th><th>Doctor</th></tr></thead>
+        <tbody>
+          {% for d in diagnoses %}
+            <tr>
+              <td>{{ d.date.strftime('%b %d, %Y %I:%M %p') if d.date else "—" }}</td>
+              <td>{{ d.diagnosis or "—" }}</td>
+              <td>{{ d.doctor.full_name() if d.doctor else "—" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No diagnosis recorded yet.</p>
+  {% endif %}
+{{ end_section() }}
 
-/* No Data Alert */
-.no-data-alert {
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
-  color: #856404;
-  padding: 15px;
-  border-radius: 8px;
-  font-size: 1rem;
-  text-align: center;
-  margin-bottom: 20px;
-}
+{{ section_card('medications', 'Medications') }}
+  <!-- Prescriptions -->
+  {% if prescriptions %}
+    <h6 class="mt-3">Prescribed Medications (Doctor)</h6>
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead class="table-light"><tr>
+          <th>Date</th><th>Drug</th><th>Dosage</th><th>Frequency</th><th>Duration</th><th>Route</th><th>By</th>
+        </tr></thead>
+        <tbody>
+          {% for med in prescriptions %}
+            <tr>
+              <td>{{ med.date_prescribed.strftime('%b %d, %Y %I:%M %p') if med.date_prescribed else "—" }}</td>
+              <td>{{ med.drug_name }}</td>
+              <td>{{ med.dosage }}</td>
+              <td>{{ med.frequency }}</td>
+              <td>{{ med.duration }}</td>
+              <td>{{ med.route|default('—') }}</td>
+              <td>{{ med.prescribed_by }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No prescriptions recorded.</p>
+  {% endif %}
 
-/* Back Button */
-.back-btn {
-  display: inline-block;
-  background-color: #6c757d;
-  color: #fff;
-  padding: 10px 20px;
-  font-weight: 500;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
+  <!-- Nurse Chart -->
+  <h6 class="mt-4">Charted / Administered Medications (Nurse)</h6>
+  {% if charts %}
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered" id="chartTable">
+        <thead class="table-light"><tr>
+          <th>Scheduled</th><th>Drug</th><th>Dose</th><th>Route</th><th>Nurse</th><th>Status</th>
+        </tr></thead>
+        <tbody>
+          {% for adm in charts %}
+            {% set now = datetime.utcnow() %}
+            {% set diff = (adm.scheduled_time - now).total_seconds() if adm.scheduled_time else none %}
+            {% set row_class = (
+                'green-row' if adm.administered else
+                'red-row'   if adm.scheduled_time and adm.scheduled_time < now else
+                'blue-row'  if diff and 0 <= diff <= 900 else
+                'yellow-row'
+            ) %}
+            <tr class="{{ row_class }}" id="row-{{ adm.id }}">
+              <td>{{ adm.scheduled_time.strftime('%b %d, %Y %I:%M %p') if adm.scheduled_time else "—" }}</td>
+              <td>{{ adm.drug_name }}</td>
+              <td>{{ adm.dosage or "—" }}</td>
+              <td>{{ adm.route or "—" }}</td>
+              <td id="nurse-{{ adm.id }}">{{ adm.nurse.full_name() if adm.nurse else "—" }}</td>
+              <td class="status-cell" id="status-{{ adm.id }}">
+                {% if not adm.administered %}
+                  <div class="form-check">
+                    <input class="form-check-input admin-checkbox" type="checkbox"
+                           data-url="{{ url_for('patients.chart_medications', patient_id=patient.id, med_id=adm.id) }}">
+                    <label class="form-check-label">Tick when given</label>
+                  </div>
+                {% else %}
+                  Given at {{ adm.date_administered.strftime('%I:%M %p') if adm.date_administered else '' }}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">No nurse-charted medications yet.</p>
+  {% endif %}
 
-.back-btn:hover {
-  background-color: #5a6268;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-}
+  <div class="d-flex gap-2 mt-3">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#chartModal">Chart Medication</button>
+    <form method="POST" action="{{ url_for('patients.delete_chart', patient_id=patient.id) }}" class="d-inline">
+      <button type="submit" class="btn btn-danger">Delete Chart</button>
+    </form>
+  </div>
+{{ end_section() }}
 
-/* Responsive */
-@media (max-width: 768px) {
-  .summary-table {
-    min-width: 100%;
+{# ====================== CHART MODAL ====================== #}
+<div class="modal fade" id="chartModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Chart Medications</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{{ url_for('patients.chart_medications', patient_id=patient.id) }}">
+          <table class="table table-sm" id="medicationTable">
+            <thead class="table-light">
+              <tr>
+                <th>Drug Name</th><th>Dose</th><th>Route</th><th>Scheduled Time</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" name="drug_name[]" class="form-control" required></td>
+                <td><input type="text" name="dose_given[]" class="form-control" required></td>
+                <td><input type="text" name="route[]" class="form-control"></td>
+                <td><input type="datetime-local" name="scheduled_time[]" class="form-control" required></td>
+                <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">Remove</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="addMedRow()">Add Another</button>
+          <div class="mt-3 d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save All</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ====================== FOOTER ====================== #}
+<div class="d-flex justify-content-between mt-4">
+  <a href="{{ url_for('patients.patient_detail', patient_id=patient.id) }}" class="btn btn-outline-secondary">
+    Back to Dashboard
+  </a>
+  <a href="{{ url_for('patients.download_summary_pdf', patient_id=patient.id) }}" class="btn btn-success" target="_blank">
+    Download Summary (PDF)
+  </a>
+</div>
+
+{# ====================== JS ====================== #}
+<script>
+  // Add row to medication chart modal
+  function addMedRow() {
+    const tbody = document.querySelector('#medicationTable tbody');
+    const tr = tbody.querySelector('tr').cloneNode(true);
+    tr.querySelectorAll('input').forEach(i => i.value = '');
+    tbody.appendChild(tr);
   }
-}
-</style>
+
+  // Checkbox → mark as administered
+  document.querySelectorAll('.admin-checkbox').forEach(cb => {
+    cb.addEventListener('change', function () {
+      if (!this.checked) return;
+      const url = this.dataset.url;
+      const row = this.closest('tr');
+      const statusCell = row.querySelector('.status-cell');
+      const nurseCell = row.querySelector('[id^="nurse-"]');
+
+      fetch(url, {method: 'POST'})
+        .then(r => r.ok ? r.text() : Promise.reject())
+        .then(() => {
+          const now = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+          statusCell.innerHTML = `Given at ${now}`;
+          nurseCell.textContent = 'You';
+          row.className = 'green-row';
+        })
+        .catch(() => {
+          alert('Failed to update');
+          this.checked = false;
+        });
+    });
+  });
+</script>
 {% endblock %}

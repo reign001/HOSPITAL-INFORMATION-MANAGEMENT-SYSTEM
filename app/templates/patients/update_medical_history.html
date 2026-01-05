@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+  <h2>🩺 Update Medical History for {{ patient.full_name() }}</h2>
+
+  <form method="POST">
+    <label>Chronic Conditions</label>
+    <textarea name="chronic_conditions" rows="3">{{ patient.medical_history.chronic_conditions if patient.medical_history else '' }}</textarea>
+
+    <label>Past Surgeries</label>
+    <textarea name="past_surgeries" rows="3">{{ patient.medical_history.past_surgeries if patient.medical_history else '' }}</textarea>
+
+    <label>Current Medications</label>
+    <textarea name="current_medications" rows="3">{{ patient.medical_history.current_medications if patient.medical_history else '' }}</textarea>
+
+    <label>Allergies</label>
+    <textarea name="allergies" rows="3">{{ patient.medical_history.allergies if patient.medical_history else '' }}</textarea>
+
+    <label>Immunizations</label>
+    <textarea name="immunizations" rows="3">{{ patient.medical_history.immunizations if patient.medical_history else '' }}</textarea>
+
+    <label>Blood Group</label>
+    <select name="blood_group">
+      <option value="">-- Select --</option>
+      {% for group in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+      <option value="{{ group }}" {% if patient.medical_history and patient.medical_history.blood_group == group %}selected{% endif %}>{{ group }}</option>
+      {% endfor %}
+    </select>
+
+    <label>Genotype</label>
+    <select name="genotype">
+      <option value="">-- Select --</option>
+      {% for gtype in ['AA', 'AS', 'SS', 'AC', 'SC'] %}
+      <option value="{{ gtype }}" {% if patient.medical_history and patient.medical_history.genotype == gtype %}selected{% endif %}>{{ gtype }}</option>
+      {% endfor %}
+    </select>
+
+    <div class="button-group">
+      <button type="submit" class="btn save-btn">💾 Save</button>
+      <a href="{{ url_for('patients.patient_detail', patient_id=patient.id) }}" class="btn cancel-btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<style>
+.form-container {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-width: 700px;
+  margin: auto;
+}
+textarea, select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+}
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+.btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  transition: 0.2s;
+}
+.save-btn { background: #4CAF50; }
+.cancel-btn { background: #9E9E9E; }
+</style>
+{% endblock %}

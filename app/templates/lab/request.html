@@ -123,28 +123,43 @@
         <thead>
           <tr>
             <th>Patient</th>
-            <th>Tests</th>
+            <th>Tests Requested</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
+
         <tbody>
-          {% for req in requests %}
+          {% for req in all_requests %}
             <tr>
-              <td>{{ req.patient.full_name() }}</td>
+              <td>
+                {{ req.patient.first_name }} {{ req.patient.last_name }}
+              </td>
+
               <td>{{ req.tests_requested }}</td>
+
               <td>
                 <span class="status 
-                  {% if req.status == 'Pending' %}status-pending{% elif req.status == 'Completed' %}status-completed{% endif %}">
+                  {% if req.status == 'Pending' %}
+                    status-pending
+                  {% elif req.status == 'Completed' %}
+                    status-completed
+                  {% else %}
+                    status-other
+                  {% endif %}
+                ">
                   {{ req.status }}
                 </span>
               </td>
+
               <td>
-                <a href="{{ url_for('lab.process_lab_request', request_id=req.id) }}" class="btn-process">
+                <a href="{{ url_for('lab.process_lab_request', request_id=req.id) }}"
+                   class="btn-process">
                   <i class="bi bi-pencil-square me-1"></i> Process
                 </a>
               </td>
             </tr>
+
           {% else %}
             <tr>
               <td colspan="4" class="text-center py-4 text-muted">
@@ -153,15 +168,19 @@
             </tr>
           {% endfor %}
         </tbody>
+
       </table>
     </div>
   </div>
 </div>
+
 <br><br>
+
 <div>
-    <a href="{{ url_for('lab.lab_index') }}" class="back-btn">
-      <i class="bi bi-arrow-left-circle me-2"></i> Back to Dashboard
-    </a>
+  <a href="{{ url_for('lab.lab_index') }}" class="back-btn">
+    <i class="bi bi-arrow-left-circle me-2"></i> Back to Dashboard
+  </a>
 </div>
+
 
 {% endblock %}

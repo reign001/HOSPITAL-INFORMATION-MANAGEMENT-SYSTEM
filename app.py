@@ -1,5 +1,6 @@
 from app import create_app, db
-from app.models import User  # import models after db
+import os
+# from app.modelsx import User  # import models after db
 from flask_login import login_manager
 
 app = create_app()

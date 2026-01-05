@@ -1,0 +1,9 @@
+<h2>Reply to {{ original.sender.first_name }}</h2>
+
+<p><strong>Original Subject:</strong> {{ original.subject }}</p>
+<p><strong>Message:</strong> {{ original.content }}</p>
+
+<form method="POST">
+    <textarea name="content" rows="5" placeholder="Write your reply..." required></textarea>
+    <button type="submit" class="btn btn-primary">Send Reply</button>
+</form>

@@ -1,0 +1,766 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="summary-container">
+  <div class="summary-header">
+  <h2>🧍‍♂️ Patient Summary — {{ patient.full_name() }} ::
+    {% if patient.ward %}
+      <span class="badge bg-info text-dark ms-2">Ward: {{ patient.ward }}</span>
+    {% else %}
+      <span class="text-muted ms-2">(No ward assigned)</span>
+    {% endif %}
+  </h2>
+
+  <p class="subtitle">Hospital Number: {{ patient.hospital_number }}</p>
+  <div class="action-buttons">
+    <!-- Submit to Nurses -->
+    <form method="POST" action="{{ url_for('patients.submit_to_nurse', patient_id=patient.id) }}" style="display:inline;">
+      <button type="submit" class="btn primary-btn">📤 Submit Folder</button>
+    </form>
+    <!-- Queue to Doctor -->
+    <div class="dropdown">
+      <button class="btn secondary-btn dropdown-toggle" onclick="toggleDropdown()">👨‍⚕️ Queue Folder</button>
+      <div id="doctorDropdown" class="dropdown-content">
+        {% for doctor in doctors %}
+          <form method="POST" action="{{ url_for('patients.queue_to_doctor', patient_id=patient.id, doctor_id=doctor.id) }}">
+            <button type="submit" class="dropdown-item">{{ doctor.full_name() }}</button>
+          </form>
+        {% else %}
+          <p class="muted">No doctors available.</p>
+        {% endfor %}
+      </div>
+    </div>
+        <!-- Add / Edit Ward -->
+    <form method="POST" action="{{ url_for('patients.add_ward', patient_id=patient.id) }}" class="d-inline">
+      <button type="submit" class="btn btn-outline-info btn-sm">🏥 Add Ward</button>
+      <input type="text" name="ward_name" placeholder="Enter ward..." class="form-control d-inline w-auto" required style="height: 30px;">
+    </form>
+  </div>
+</div>
+
+
+  <!-- ... existing summary sections follow ... -->
+
+  <!-- Navigation Buttons -->
+  <div class="quick-links">
+    <a href="#basic-info" class="btn small-btn">Basic Info</a>
+    <a href="#social-history" class="btn small-btn">Social</a>
+    <a href="#family-history" class="btn small-btn">Family</a>
+    <a href="#immunization" class="btn small-btn">Immunization</a>
+    <a href="#vitals" class="btn small-btn">Vitals</a>
+    <a href="#allergies" class="btn small-btn">Allergies</a>
+    <a href="#lab-investigations" class="btn small-btn">Investigations</a>
+    <a href="#diagnosis" class="btn small-btn">Diagnosis</a>
+    <a href="#medications" class="btn small-btn">Prescriptions</a>
+  </div>
+
+
+    <!-- SEARCH BAR -->
+  <form method="GET" action="{{ url_for('patients.patient_summary', patient_id=patient.id) }}" class="search-bar">
+    <input type="date" name="visit_date" value="{{ request.args.get('visit_date', '') }}">
+    <button type="submit" class="btn search-btn">🔍 Search by Date</button>
+  </form>
+
+
+  <!-- Basic Information -->
+  <section class="card" id="basic-info">
+    <div class="section-header">
+      <h3>🩺 Basic Information</h3>
+      <a href="{{ url_for('patients.update_patient', patient_id=patient.id) }}" class="edit-btn">✏️ Edit</a>
+    </div>
+    <p><strong>Name:</strong> {{ patient.full_name() }}</p>
+    <p><strong>Sex:</strong> {{ patient.sex.value }}</p>
+    <p><strong>Date of Birth:</strong> {{ patient.date_of_birth.strftime('%b %d, %Y') if patient.date_of_birth else "—" }}</p>
+    <p><strong>Phone:</strong> {{ patient.phone_number }}</p>
+    <p><strong>Email:</strong> {{ patient.email or "—" }}</p>
+    <p><strong>Address:</strong> {{ patient.address or "—" }}</p>
+    <p><strong>Religion:</strong> {{ patient.religion or "—" }}</p>
+    <p><strong>NHIS Status:</strong> {{ patient.nhis_status or "—" }}</p>
+  </section>
+
+  <!-- Social History -->
+<section class="card" id="social-history">
+  <div class="section-header">
+    <h3>🏠 Social History</h3>
+    <a href="{{ url_for('patients.update_social_history', patient_id=patient.id) }}" class="edit-btn">➕ Add / Edit</a>
+  </div>
+  {% if social_history %}
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Occupation</th>
+          <th>Marital Status</th>
+          <th>Alcohol Use</th>
+          <th>Smoking</th>
+          <th>Drug Use</th>
+          <th>Living Conditions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ social_history.occupation or "—" }}</td>
+          <td>{{ social_history.marital_status or "—" }}</td>
+          <td>{{ "Yes" if social_history.alcohol else "No" }}</td>
+          <td>{{ "Yes" if social_history.smoking else "No" }}</td>
+          <td>{{ "Yes" if social_history.drug_use else "No" }}</td>
+          <td>{{ social_history.living_conditions or "—" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  {% else %}
+    <p>No social history recorded.</p>
+  {% endif %}
+</section>
+
+
+  <!-- Family History -->
+  <!-- Family History -->
+<section class="card" id="family-history">
+  <div class="section-header">
+    <h3>👨‍👩‍👧 Family History</h3>
+    <a href="{{ url_for('patients.family_history', patient_id=patient.id) }}" class="edit-btn">➕ Add / Edit</a>
+  </div>
+  {% if family_history %}
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Diabetes</th>
+          <th>Hypertension</th>
+          <th>Cancer</th>
+          <th>Heart Disease</th>
+          <th>Sickle Cell</th>
+          <th>Tuberculosis</th>
+          <th>Asthma</th>
+          <th>Stroke</th>
+          <th>Mental Illness</th>
+          <th>Other Conditions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ "Yes" if family_history.diabetes else "No" }}</td>
+          <td>{{ "Yes" if family_history.hypertension else "No" }}</td>
+          <td>{{ "Yes" if family_history.cancer else "No" }}</td>
+          <td>{{ "Yes" if family_history.heart_disease else "No" }}</td>
+          <td>{{ "Yes" if family_history.sickle_cell else "No" }}</td>
+          <td>{{ "Yes" if family_history.tuberculosis else "No" }}</td>
+          <td>{{ "Yes" if family_history.asthma else "No" }}</td>
+          <td>{{ "Yes" if family_history.stroke else "No" }}</td>
+          <td>{{ "Yes" if family_history.mental_illness else "No" }}</td>
+          <td>{{ family_history.other_conditions or "—" }}</td>
+        </tr>
+      </tbody>
+    </table>
+  {% else %}
+    <p>No family history recorded.</p>
+  {% endif %}
+</section>
+
+
+  <!-- Immunization -->
+  <section class="card" id="immunization">
+    <div class="section-header">
+      <h3>💉 Immunization History</h3>
+      <a href="{{ url_for('patients.immunizations', patient_id=patient.id) }}" class="edit-btn">➕ Add / Edit</a>
+    </div>
+    {% if immunizations %}
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Vaccine</th>
+            <th>Date</th>
+            <th>Next Due</th>
+            <th>Administered By</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in immunizations %}
+          <tr>
+            <td>{{ i.vaccine_name }}</td>
+            <td>{{ i.date_administered.strftime('%b %d, %Y') if i.date_administered else "—" }}</td>
+            <td>{{ i.next_due_date.strftime('%b %d, %Y') if i.next_due_date else "—" }}</td>
+            <td>{{ i.administered_by or "—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No immunization record found.</p>
+    {% endif %}
+  </section>
+
+<!-- Vital Signs -->
+<section class="card" id="vitals">
+  <div class="section-header">
+    <h3>🫀 Vital Signs</h3>
+    <a href="{{ url_for('patients.vitals', patient_id=patient.id) }}" class="edit-btn">➕ Add / Edit</a>
+  </div>
+
+<section class="vitals-section">
+  <h4>🩸 Vital Signs</h4>
+  {% if vitals and vitals|length > 0 %}
+    <div class="table-responsive">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Date Recorded</th>
+            <th>Blood Pressure</th>
+            <th>Heart Rate</th>
+            <th>Temperature (°C)</th>
+            <th>Resp. Rate</th>
+            <th>Weight (kg)</th>
+            <th>Recorded By</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in vitals %}
+          <tr>
+            <td>{{ v.date_recorded.strftime('%b %d, %Y %I:%M %p') if v.date_recorded else "—" }}</td>
+            <td>{{ v.blood_pressure or "—" }}</td>
+            <td>{{ v.heart_rate or "—" }}</td>
+            <td>{{ v.temperature or "—" }}</td>
+            <td>{{ v.respiratory_rate or "—" }}</td>
+            <td>{{ v.weight or "—" }}</td>
+            <td>{{ v.recorded_by or "—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted">No vital signs recorded.</p>
+  {% endif %}
+</section>
+<br>
+<hr>
+<br>
+  <!-- Allergies -->
+  <section class="card" id="allergies">
+    <div class="section-header">
+      <h3>🤧 Allergies</h3>
+      <a href="{{ url_for('patients.allergies', patient_id=patient.id) }}" class="edit-btn">➕ Add / Edit</a>
+    </div>
+    {% if allergies %}
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Allergen</th>
+            <th>Reaction</th>
+            <th>Severity</th>
+            <th>Date Identified</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in allergies %}
+          <tr>
+            <td>{{ a.allergen }}</td>
+            <td>{{ a.reaction or "—" }}</td>
+            <td>{{ a.severity }}</td>
+            <td>{{ a.date_identified.strftime('%b %d, %Y') if a.date_identified else "—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No allergy information recorded.</p>
+    {% endif %}
+  </section>
+
+<!-- LAB INVESTIGATIONS SECTION -->
+<section class="card" id="lab-investigations">
+  <h3>🧪 Laboratory Investigations</h3>
+
+  {% if investigations and investigations|length > 0 %}
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Date Requested</th>
+          <th>Tests Requested</th>
+          <th>Status</th>
+          <th>Results</th>
+          <th>Verified By</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inv in investigations %}
+        <tr>
+          <td>{{ inv.created_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+          <td>
+            {# If tests_requested was stored as comma-separated values #}
+            {% for test in inv.tests_requested.split(',') %}
+              <p>{{ test.strip() }}</p>
+            {% endfor %}
+          </td>
+          <td>{{ inv.status }}</td>
+
+          <td>
+            {% if inv.results and inv.results|length > 0 %}
+              <ul>
+                {% for res in inv.results %}
+                  <li>
+                    <strong>{{ res.test_name }}:</strong> 
+                    {{ res.result_value or "Pending" }}
+                    {% if res.normal_range %}<em>(Normal: {{ res.normal_range }})</em>{% endif %}
+                    {% if res.comments %}<br><small>{{ res.comments }}</small>{% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <span class="text-muted">Pending</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if inv.results %}
+              {% for res in inv.results %}
+                <p>{{ res.verified_by or "—" }}</p>
+              {% endfor %}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="text-muted">No investigations recorded for this patient.</p>
+  {% endif %}
+</section>
+<hr>
+<!-- 🧠 DIAGNOSIS SECTION -->
+<section class="card" id="diagnosis">
+  <div class="section-header">
+    <h3>🧠 Diagnoses</h3>
+  </div>
+
+  {% if diagnoses and diagnoses|length > 0 %}
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Diagnosis</th>
+          <th>Doctor</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in diagnoses %}
+        <tr>
+          <td>{{ d.date.strftime('%b %d, %Y %I:%M %p') if d.date else "—" }}</td>
+          <td>{{ d.diagnosis or "—" }}</td>
+          <td>{{ d.doctor.full_name() if d.doctor else "—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No diagnosis recorded yet.</p>
+  {% endif %}
+</section>
+<hr>
+
+<section class="card" id="medications">
+  <div class="section-header">
+    <h3>Medications</h3>
+  </div>
+
+  {% if prescriptions %}
+    <h4>Prescribed Medications (Doctor)</h4>
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Drug Name</th>
+          <th>Dosage</th>
+          <th>Frequency</th>
+          <th>Duration</th>
+          <th>Route</th>
+          <th>Prescribed By</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for med in prescriptions %}
+        <tr>
+          <td>
+            {% if med.date_prescribed %}
+              {{ med.date_prescribed.strftime('%b %d, %Y %I:%M %p') }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td>{{ med.drug_name }}</td>
+          <td>{{ med.dosage }}</td>
+          <td>{{ med.frequency }}</td>
+          <td>{{ med.duration }}</td>
+          <td>{{ med.route | default('—') }}</td>
+          <td>
+              {{ med.prescribed_by }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">No prescriptions recorded.</p>
+  {% endif %}
+</section>
+
+  <hr>
+
+<h4>Charted / Administered Medications (Nurse)</h4>
+
+{% if charts %}
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>Scheduled Time</th>
+        <th>Drug</th>
+        <th>Dose</th>
+        <th>Route</th>
+        <th>Nurse</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for adm in charts %}
+        {% set now = datetime.utcnow() %}
+        {% set time_diff = (adm.scheduled_time - now).total_seconds() if adm.scheduled_time else None %}
+        
+        {% set row_class = (
+          'green-row' if adm.administered
+          else 'red-row' if adm.scheduled_time and adm.scheduled_time < now
+          else 'blue-row' if adm.scheduled_time and 0 <= (adm.scheduled_time - now).total_seconds() <= 900
+          else 'yellow-row'
+        ) %}
+        
+        <tr class="{{ row_class }}" id="row-{{ adm.id }}">
+          <td>{{ adm.scheduled_time.strftime('%b %d, %Y %I:%M %p') if adm.scheduled_time else "—" }}</td>
+          <td>{{ adm.drug_name }}</td>
+          <td>{{ adm.dosage or "—" }}</td>
+          <td>{{ adm.route or "—" }}</td>
+          <td id="nurse-{{ adm.id }}">{{ adm.nurse.full_name() if adm.nurse else "—" }}</td>
+          <td class="status-cell" id="status-{{ adm.id }}">
+            {% if not adm.administered %}
+              <input type="checkbox" 
+                     class="admin-checkbox" 
+                     data-url="{{ url_for('patients.chart_medications', patient_id=patient.id, med_id=adm.id) }}"> 
+              Tick when given
+            {% else %}
+              ✅ Given at {{ adm.date_administered.strftime('%I:%M %p') if adm.date_administered else '' }}
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="muted">No nurse-charted medications yet.</p>
+{% endif %}
+
+<div class="action-buttons">
+  <button class="btn primary-btn" onclick="openChartForm()">📋 Chart Medication</button>
+  <form method="POST" action="{{ url_for('patients.delete_chart', patient_id=patient.id) }}" style="display:inline;">
+    <button type="submit" class="btn danger-btn">🗑 Delete Chart</button>
+  </form>
+</div>
+  <!-- Chart Medication Modal -->
+  <div id="chartForm" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeChartForm()">&times;</span>
+      <h4>Chart Medications</h4>
+      <form method="POST" action="{{ url_for('patients.chart_medications', patient_id=patient.id) }}">
+        <table id="medicationTable" class="styled-table">
+          <thead>
+            <tr>
+              <th>Drug Name</th>
+              <th>Dose</th>
+              <th>Route</th>
+              <th>Time to Administer</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="text" name="drug_name[]" required></td>
+              <td><input type="text" name="dose_given[]" required></td>
+              <td><input type="text" name="route[]"></td>
+              <td><input type="datetime-local" name="scheduled_time[]" required></td>
+              <td><button type="button" class="btn danger-btn" onclick="removeRow(this)">✖</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn secondary-btn" onclick="addRow()">➕ Add Another</button>
+        <button type="submit" class="btn primary-btn">Save All</button>
+      </form>
+    </div>
+  </div>
+</section>
+ </section>
+
+
+
+  <div class="footer-links">
+    <a href="{{ url_for('patients.patient_summary', patient_id=patient.id) }}" class="btn back-btn">⬅ Back</a>
+  </div>
+</div>
+
+  <div class="summary-header">
+  <h2>Patient Summary: {{ patient.full_name() }}</h2>
+  <a href="{{ url_for('patients.download_summary_pdf', patient_id=patient.id) }}" 
+     class="btn-download" target="_blank">
+    📄 Download Summary (PDF)
+  </a>
+</div>
+
+  <div class="footer-links">
+    <a href="{{ url_for('patients.patient_detail', patient_id=patient.id) }}" class="btn back-btn">⬅ Back to Patient Dashboard</a>
+  </div>
+</div>
+
+
+<!-- Dropdown Script -->
+<script>
+  function toggleDropdown() {
+    const dropdown = document.getElementById("doctorDropdown");
+    dropdown.classList.toggle("show");
+  }
+
+  window.onclick = function(event) {
+    if (!event.target.matches('.dropdown-toggle')) {
+      const dropdowns = document.getElementsByClassName("dropdown-content");
+      for (let i = 0; i < dropdowns.length; i++) {
+        dropdowns[i].classList.remove("show");
+      }
+    }
+  };
+
+
+  function toggleDropdown() {
+  const dropdown = document.getElementById("doctorDropdown");
+  dropdown.classList.toggle("show");
+}
+window.onclick = function(event) {
+  if (!event.target.matches('.dropdown-toggle')) {
+    document.querySelectorAll(".dropdown-content").forEach(d => d.classList.remove("show"));
+  }
+};
+
+
+
+function openChartForm() { document.getElementById("chartForm").style.display = "block"; }
+function closeChartForm() { document.getElementById("chartForm").style.display = "none"; }
+
+function addRow() {
+    const table = document.getElementById("medicationTable").getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+    newRow.innerHTML = `
+        <td><input type="text" name="drug_name[]" required></td>
+        <td><input type="text" name="dose_given[]" required></td>
+        <td><input type="text" name="route[]"></td>
+        <td><input type="datetime-local" name="date_administered[]" required></td>
+        <td><button type="button" class="btn danger-btn" onclick="removeRow(this)">✖</button></td>
+    `;
+}
+
+function removeRow(btn) {
+    const row = btn.closest("tr");
+    row.remove();
+}
+
+
+
+document.querySelectorAll('.admin-checkbox').forEach(box => {
+  box.addEventListener('change', function() {
+    if (!this.checked) return; // only act when checked
+    const url = this.dataset.url;
+    const rowId = this.closest('tr').id;
+    const statusCell = document.getElementById(`status-${rowId.split('-')[1]}`);
+    const nurseCell = document.getElementById(`nurse-${rowId.split('-')[1]}`);
+
+    fetch(url, { method: 'POST' })
+      .then(response => {
+        if (response.ok) {
+          // Instantly reflect success
+          const now = new Date();
+          const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          statusCell.innerHTML = `✅ Given at ${timeString}`;
+          nurseCell.textContent = "You";  // optional: can set to current nurse dynamically
+          document.getElementById(rowId).className = 'green-row';
+        } else {
+          alert("Failed to update medication status.");
+          this.checked = false;
+        }
+      })
+      .catch(() => {
+        alert("Error connecting to server.");
+        this.checked = false;
+      });
+  });
+});
+</script>
+{% endblock %}
+
+
+<style>
+
+  .summary-container {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-width: 1100px;
+  margin: auto;
+}
+.section-header { display: flex; justify-content: space-between; align-items: center; }
+.card { border: 1px solid #ddd; padding: 1.2rem; border-radius: 10px; margin-bottom: 1.5rem; background: #fafafa; }
+.styled-table { width: 100%; border-collapse: collapse; margin-top: .5rem; }
+.styled-table th, .styled-table td { padding: 8px 12px; border: 1px solid #ddd; }
+.styled-table th { background: #f0f0f0; text-align: left; }
+.search-bar { margin: 1rem 0; display: flex; gap: 10px; }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 10px; }
+.muted { color: #888; font-style: italic; }
+
+
+  .action-buttons {
+    margin: 10px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn.primary-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .btn.secondary-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    min-width: 220px;
+    z-index: 1;
+  }
+
+  .dropdown-content .dropdown-item {
+    background: none;
+    border: none;
+    color: #333;
+    text-align: left;
+    padding: 10px 14px;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .dropdown-content .dropdown-item:hover {
+    background-color: #e9ecef;
+  }
+
+  .show {
+    display: block;
+  }
+
+
+.summary-container {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-width: 1100px;
+  margin: auto;
+}
+.subtitle { color: #777; margin-bottom: 1.5rem; }
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card {
+  border: 1px solid #ddd;
+  padding: 1.2rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  background: #fafafa;
+}
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+.styled-table th, .styled-table td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+}
+.styled-table th {
+  background: #f0f0f0;
+  text-align: left;
+}
+.btn {
+  background: #004080;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+.btn:hover { background: #0059b3; }
+.edit-btn {
+  background: #28a745;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.edit-btn:hover { background: #218838; }
+.small-btn { margin-right: 5px; font-size: 0.8rem; }
+.quick-links { margin-bottom: 1.2rem; }
+.back-btn { background: #555; }
+.footer-links { text-align: center; margin-top: 2rem; }
+
+
+.modal { display: none; position: fixed; z-index: 1000; padding-top: 80px; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);}
+.modal-content { background-color: #fff; margin: auto; padding: 20px; border-radius: 8px; width: 100%; position: relative;}
+.close { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer;}
+
+
+.red-row {
+  background-color: #ffe5e5;
+  color: #b30000;
+  font-weight: 500;
+}
+
+.yellow-row {
+  background-color: #fff9e6;
+  color: #a66a00;
+}
+
+.green-row {
+  background-color: #e6ffe6;
+  color: #006600;
+  font-weight: 500;
+}
+
+.status-cell {
+  text-align: center;
+}
+
+</style>

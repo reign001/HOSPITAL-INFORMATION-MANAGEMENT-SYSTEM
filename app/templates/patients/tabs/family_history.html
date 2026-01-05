@@ -1,0 +1,18 @@
+<div class="card p-3 border-0 shadow-sm">
+  <div class="d-flex justify-content-between">
+    <h5>Family History</h5>
+    <a href="{{ url_for('patients.update_family_history', patient_id=patient.id) }}" class="btn btn-sm btn-outline-primary">
+      Edit
+    </a>
+  </div>
+  <hr>
+  {% if patient.family_history %}
+    <p><strong>Diabetes:</strong> {{ 'Yes' if patient.family_history.diabetes else 'No' }}</p>
+    <p><strong>Hypertension:</strong> {{ 'Yes' if patient.family_history.hypertension else 'No' }}</p>
+    <p><strong>Cancer:</strong> {{ 'Yes' if patient.family_history.cancer else 'No' }}</p>
+    <p><strong>Sickle Cell Disease:</strong> {{ 'Yes' if patient.family_history.sickle_cell else 'No' }}</p>
+    <p><strong>Other Conditions:</strong> {{ patient.family_history.other_conditions or 'N/A' }}</p>
+  {% else %}
+    <p class="text-muted">No family history recorded yet.</p>
+  {% endif %}
+</div>

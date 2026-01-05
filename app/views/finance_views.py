@@ -3,11 +3,11 @@ from decorators import role_required
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from app.models import FinanceRecord, HMOPayment, db, update_finance_record
+# from app.modelsx import FinanceRecord, HMOPayment, db, update_finance_record
 
 from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
-from app.models import FinanceRecord, FinanceLog
+# from app.modelsx import FinanceRecord, FinanceLog
 from app import db
 from datetime import datetime
 

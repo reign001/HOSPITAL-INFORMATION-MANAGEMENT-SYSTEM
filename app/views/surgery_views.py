@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from app import db
-from app.models import OperationDiary
+# from app.modelsx import OperationDiary
 from datetime import datetime
 from flask import flash
-from app.models import Patient
+from app.models.patients import Patient
+from app.models.operation import OperationDiary
 from decorators import role_required
 
 surgery_bp = Blueprint("surgery", __name__, url_prefix="/surgery")
@@ -117,4 +118,4 @@ def history():
 @surgery_bp.route('/history/<int:id>')
 def details(id):
     op = OperationDiary.query.get_or_404(id)
-    return render_template('surgery/details.html', op=op)
+    return render_template('surgery/details.html')

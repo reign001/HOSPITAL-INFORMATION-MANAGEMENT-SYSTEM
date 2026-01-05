@@ -1,0 +1,19 @@
+<div class="card p-3 border-0 shadow-sm">
+  <div class="d-flex justify-content-between">
+    <h5>Social History</h5>
+    <a href="{{ url_for('patients.update_social_history', patient_id=patient.id) }}" class="btn btn-sm btn-outline-primary">
+      Edit
+    </a>
+  </div>
+  <hr>
+  {% if patient.social_history %}
+    <p><strong>Smoking:</strong> {{ 'Yes' if patient.social_history.smoking else 'No' }}</p>
+    <p><strong>Alcohol Use:</strong> {{ 'Yes' if patient.social_history.alcohol else 'No' }}</p>
+    <p><strong>Drug Use:</strong> {{ 'Yes' if patient.social_history.drug_use else 'No' }}</p>
+    <p><strong>Occupation:</strong> {{ patient.social_history.occupation or 'N/A' }}</p>
+    <p><strong>Marital Status:</strong> {{ patient.social_history.marital_status or 'N/A' }}</p>
+    <p><strong>Living Conditions:</strong> {{ patient.social_history.living_conditions or 'N/A' }}</p>
+  {% else %}
+    <p class="text-muted">No social history recorded yet.</p>
+  {% endif %}
+</div>

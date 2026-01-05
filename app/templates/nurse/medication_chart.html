@@ -216,6 +216,11 @@
   <div class="dashboard-header">
     <h2>📋 Medication Chart</h2>
     <p class="subtitle">Record and review medication administration for {{ patient.full_name() }}.</p>
+
+    <!-- 🗑️ Delete Chart Button -->
+    <form method="POST" action="{{ url_for('nurse.delete_chart', patient_id=patient.id) }}" onsubmit="return confirm('Are you sure you want to delete this patient\'s medication chart?');">
+      <button type="submit" class="btn danger">🗑️ Delete Chart</button>
+    </form>
   </div>
 
   <form method="POST" class="med-form">
@@ -266,5 +271,4 @@
     </table>
   </div>
 </div>
-
 {% endblock %}

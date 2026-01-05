@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="patient-card-container">
+  <h2>Patient Card: {{ patient.full_name() }}</h2>
+  <p><strong>Hospital Number:</strong> {{ patient.hospital_number }}</p>
+  <p><strong>Date of Birth:</strong> {{ patient.date_of_birth }}</p>
+  <p><strong>Sex:</strong> {{ patient.sex }}</p>
+  <p><strong>Phone:</strong> {{ patient.phone_number }}</p>
+
+  <hr>
+  <h3>Vital Signs</h3>
+  <ul>
+    <li>Blood Pressure: {{ card.blood_pressure }}</li>
+    <li>Heart Rate: {{ card.heart_rate }}</li>
+    <li>Respiratory Rate: {{ card.respiratory_rate }}</li>
+    <li>Temperature: {{ card.temperature }}</li>
+    <li>Oxygen Saturation: {{ card.oxygen_saturation }}</li>
+    <li>Weight: {{ card.weight }}</li>
+    <li>Height: {{ card.height }}</li>
+  </ul>
+
+  <hr>
+  <h3>Clinical Details</h3>
+  <p><strong>Chief Complaint:</strong> {{ card.chief_complaint }}</p>
+  <p><strong>History of Present Illness:</strong> {{ card.history_of_present_illness }}</p>
+  <p><strong>Past Medical History:</strong> {{ card.past_medical_history }}</p>
+  <p><strong>Medications:</strong> {{ card.medications }}</p>
+  <p><strong>Allergies:</strong> {{ card.allergies }}</p>
+  <p><strong>Examination:</strong> {{ card.examination }}</p>
+  <p><strong>Assessment:</strong> {{ card.assessment }}</p>
+  <p><strong>Plan:</strong> {{ card.plan }}</p>
+</div>
+{% endblock %}

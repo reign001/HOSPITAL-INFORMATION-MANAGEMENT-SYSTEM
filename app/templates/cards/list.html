@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ patient.full_name() }} - Patient Cards</h2>
+<a href="{{ url_for('cards.new_card', patient_id=patient.id) }}" class="btn add-btn">+ New Card</a>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Created At</th>
+      <th>Chief Complaint</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for card in cards %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ card.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td>{{ card.chief_complaint }}</td>
+      <td>
+        <a href="{{ url_for('cards.card_detail', card_id=card.id) }}" class="btn view-btn">View</a>
+        <a href="{{ url_for('cards.edit_card', card_id=card.id) }}" class="btn edit-btn">Edit</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4">No cards yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

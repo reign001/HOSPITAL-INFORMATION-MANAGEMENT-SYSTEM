@@ -1,0 +1,119 @@
+<div class="summary-sidebar">
+  <h3>🧍 Patient Summary</h3>
+
+  <!-- Basic Info -->
+  <section class="summary-section">
+    <p><strong>Name:</strong> {{ patient.full_name() }}</p>
+    <p><strong>Age:</strong> {{ patient.age }}</p>
+    <p><strong>Sex:</strong> {{ patient.sex.value if patient.sex else '—' }}</p>
+    <p><strong>Hospital No:</strong> {{ patient.hospital_number }}</p>
+    <p><strong>Phone:</strong> {{ patient.phone_number or '—' }}</p>
+  </section>
+
+  <hr>
+
+  <!-- Vitals -->
+  <section class="summary-section">
+    <h4>🩸 Latest Vitals</h4>
+    {% if vitals and vitals|length > 0 %}
+      {% set v = vitals[-1] %}
+      <p><strong>BP:</strong> {{ v.blood_pressure or '—' }}</p>
+      <p><strong>Pulse:</strong> {{ v.heart_rate or '—' }}</p>
+      <p><strong>Temp:</strong> {{ v.temperature or '—' }}</p>
+      <p><strong>Resp Rate:</strong> {{ v.respiratory_rate or '—' }}</p>
+      <p><strong>Weight:</strong> {{ v.weight or '—' }}</p>
+      <p class="muted">Last updated: {{ v.date_recorded.strftime('%b %d, %Y %I:%M %p') if v.date_recorded else '—' }}</p>
+    {% else %}
+      <p class="muted">No vitals recorded.</p>
+    {% endif %}
+  </section>
+
+  <hr>
+  <!-- Allergies -->
+  <section class="summary-section">
+    <h4>🤧 Allergies</h4>
+    {% if allergies and allergies|length > 0 %}
+      <ul class="allergy-list">
+        {% for a in allergies %}
+          <li>
+            <strong>{{ a.allergen }}</strong> — {{ a.reaction or 'No reaction noted' }}
+            <span class="severity {{ a.severity|lower }}">{{ a.severity }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No allergies recorded.</p>
+    {% endif %}
+  </section>
+
+  <hr>
+
+  <!-- Quick Link -->
+  <div class="summary-actions">
+    <a href="{{ url_for('patients.patient_summary', patient_id=patient.id) }}" class="btn btn-secondary">📋 Full Detail</a>
+  </div>
+</div>
+
+<style>
+.summary-sidebar {
+  font-size: 0.9rem;
+}
+
+.summary-sidebar h3 {
+  color: #043873;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.summary-section h4 {
+  color: #1d4ed8;
+  margin-top: 10px;
+  font-size: 1rem;
+}
+
+.summary-section p {
+  margin: 4px 0;
+}
+
+.allergy-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.allergy-list li {
+  margin-bottom: 6px;
+}
+
+.severity {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  margin-left: 6px;
+}
+
+.severity.mild { background: #e0f7e9; color: #0a7f2e; }
+.severity.moderate { background: #fff5e6; color: #b45309; }
+.severity.severe { background: #fde8e8; color: #991b1b; }
+
+.muted {
+  color: #888;
+  font-style: italic;
+}
+
+.summary-actions {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.summary-actions .btn-secondary {
+  background: #e2e8f0;
+  color: #1e3a8a;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+.summary-actions .btn-secondary:hover {
+  background: #cbd5e1;
+}
+</style>

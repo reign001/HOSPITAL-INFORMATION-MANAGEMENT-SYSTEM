@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from datetime import datetime
 from app import db
-from app.models import OutPatientRecord
+from app.models.outpatient import OutPatientRecord
 from app.forms import OutPatientForm
 from decorators import role_required
 
@@ -80,3 +80,4 @@ def delete_outpatient(patient_id):
     db.session.commit()
     flash("Outpatient record deleted!", "danger")
     return redirect(url_for("outpatient.list_outpatients"))
+

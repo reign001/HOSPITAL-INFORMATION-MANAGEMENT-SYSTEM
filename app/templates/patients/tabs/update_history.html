@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-sm p-4">
+    <h4>Update Medical History for {{ patient.full_name() }}</h4>
+    <form method="POST">
+      <div class="mb-3">
+        <label>Chronic Conditions</label>
+        <textarea name="chronic_conditions" class="form-control" rows="2">{{ patient.medical_history.chronic_conditions if patient.medical_history else '' }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label>Past Surgeries</label>
+        <textarea name="past_surgeries" class="form-control" rows="2">{{ patient.medical_history.past_surgeries if patient.medical_history else '' }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label>Current Medications</label>
+        <textarea name="current_medications" class="form-control" rows="2">{{ patient.medical_history.current_medications if patient.medical_history else '' }}</textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="{{ url_for('patients.patient_detail', patient_id=patient.id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

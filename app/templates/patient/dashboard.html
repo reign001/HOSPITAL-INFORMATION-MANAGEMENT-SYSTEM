@@ -1,0 +1,109 @@
+{% extends "layouts/patient_base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-3">Welcome, {{ patient.full_name() }}</h2>
+
+    <div class="list-group mb-4">
+        <a href="{{ url_for('patient_chat.inbox') }}" class="list-group-item list-group-item-action">
+            📥 Inbox / Messages
+        </a>
+
+        <a href="{{ url_for('patient_chat.select_doctor') }}" class="list-group-item list-group-item-action">
+            👨‍⚕️ Chat With a Doctor
+        </a>
+
+        <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action text-danger">
+            🚪 Logout
+        </a>
+    </div>
+
+    <!-- Make a Request Section -->
+    <div class="card">
+        <div class="card-header">
+            📝 Make a Request
+        </div>
+        <div class="card-body">
+            <form id="patientRequestForm">
+                <div class="mb-3">
+                    <label for="requestType" class="form-label">Request Type</label>
+                    <select id="requestType" class="form-select" required>
+                        <option value="" disabled selected>Select a request</option>
+                        <option value="appointment">Appointment</option>
+                        <option value="medical_record">Medical Record</option>
+                        <option value="prescription_refill">Prescription Refill</option>
+                        <option value="lab_test">Lab Test</option>
+                        <option value="billing_inquiry">Billing Inquiry</option>
+                        <option value="diet_request">Diet Request</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="requestDetails" class="form-label">Additional Details</label>
+                    <textarea id="requestDetails" class="form-control" rows="3" placeholder="Provide details about your request"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<h3>My Requests</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Details</th>
+            <th>Status</th>
+            <th>Admin Note</th>
+            <th>Submitted At</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for req in patient.requests %}
+        <tr>
+            <td>{{ req.request_type }}</td>
+            <td>{{ req.details }}</td>
+            <td>{{ req.status }}</td>
+            <td>{{ req.admin_note }}</td>
+            <td>{{ req.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+document.getElementById("patientRequestForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const type = document.getElementById("requestType").value;
+    const details = document.getElementById("requestDetails").value.trim();
+
+    if(!type) {
+        alert("Please select a request type");
+        return;
+    }
+
+    fetch("{{ url_for('patients.submit_request') }}", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ request_type: type, details: details })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "ok"){
+            alert("Your request has been submitted successfully!");
+            document.getElementById("patientRequestForm").reset();
+        } else {
+            alert("Failed to submit request. Please try again.");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("An error occurred. Try again.");
+    });
+});
+</script>
+{% endblock %}

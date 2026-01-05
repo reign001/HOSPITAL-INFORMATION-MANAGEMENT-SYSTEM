@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="clerk-layout">
+  <!-- Main Clerking Form -->
+  <div class="clerk-main">
+    <div class="header">
+      <h2>🩺 Clerking for {{ patient.full_name() }}</h2>
+      <div class="header-actions">
+        <p><strong>Hospital Number:</strong> {{ patient.hospital_number }}</p>
+ 
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Action Buttons -->
+<div class="action-buttons">
+      <a href="{{ url_for('patients.patient_summary', patient_id=patient.id) }}" class="btn btn-secondary">
+        View Full Details
+        </a>
+  <button type="button" class="btn btn-info" id="investigationBtn">🧪 Request Investigation</button>
+  <button type="button" class="btn btn-warning" id="referBtn">🏥 Refer Patient</button>
+  <button type="button" class="btn btn-success" id="admitBtn">🏥 Admit Patient</button>
+  <button type="button" class="btn btn-secondary" id="outpatientBtn">💊 Outpatient</button>
+</div>
+
+<!-- Prescription Modal -->
+<div id="prescriptionModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" id="closePrescriptionModal">&times;</span>
+    <h3 id="modalTitle">Prescription Form</h3>
+
+    <form id="prescriptionForm" method="POST">
+      <div class="form-group">
+        <label>Medication Name</label>
+        <input type="text" name="medication_name" required>
+      </div>
+
+      <div class="form-group">
+        <label>Dosage</label>
+        <input type="text" name="dosage" required>
+      </div>
+
+      <div class="form-group">
+        <label>Frequency</label>
+        <input type="text" name="frequency" required>
+      </div>
+
+      <div class="form-group">
+        <label>Duration</label>
+        <input type="text" name="duration" required>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea name="notes" rows="2" placeholder="Optional notes..."></textarea>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">💾 Save Prescription</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <form method="POST">
+      <div class="form-section">
+        <label>Presenting Complaint</label>
+        <textarea name="presenting_complaint" rows="2">{{ history.presenting_complaint if history else '' }}</textarea>
+      </div>
+
+      <div class="form-section">
+        <label>History of Presenting Complaint</label>
+        <textarea name="history_of_presenting_complaint" rows="4">{{ history.history_of_presenting_complaint if history else '' }}</textarea>
+      </div>
+
+      <div class="form-section">
+        <label>Past Medical History</label>
+        <textarea name="past_medical_history" rows="3">{{ history.past_medical_history if history else '' }}</textarea>
+      </div>
+
+      <div class="form-section">
+        <label>Drug History</label>
+        <textarea name="drug_history" rows="3">{{ history.drug_history if history else '' }}</textarea>
+      </div>
+
+      <div class="form-section">
+        <label>Family History</label>
+        <textarea name="family_history" rows="3">{{ history.family_history if history else '' }}</textarea>
+      </div>
+
+      <div class="form-section">
+        <label>Social History</label>
+        <textarea name="social_history" rows="3">{{ history.social_history if history else '' }}</textarea>
+      </div>
+
+      <div class="form-section">
+        <label>Examination Findings</label>
+        <textarea name="examination_findings" rows="4">{{ history.examination_findings if history else '' }}</textarea>
+      </div>
+
+      <div class="form-section">
+        <label>Provisional Diagnosis</label>
+        <textarea name="provisional_diagnosis" rows="2">{{ history.provisional_diagnosis if history else '' }}</textarea>
+      </div>
+
+      <div class="form-section">
+        <label>Management Plan</label>
+        <textarea name="plan" rows="3">{{ history.plan if history else '' }}</textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">💾 Save Clerking</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Sidebar: Patient Summary -->
+  <aside class="patient-sidebar">
+    {% include "patients/summary_partial.html" %}
+  </aside>
+</div>
+
+<!-- REFERRAL MODAL -->
+<div id="referralModal" class="modal">
+  <div class="modal-content">
+    <h3>🏥 Refer Patient</h3>
+    <form id="referralForm">
+      <div class="form-section">
+        <label>Referral Type</label>
+        <select name="referral_type">
+          <option value="Internal Specialist">Internal Specialist</option>
+          <option value="External Hospital">External Hospital</option>
+        </select>
+      </div>
+      <div class="form-section">
+        <label>Reason for Referral</label>
+        <textarea name="reason" rows="3" required></textarea>
+      </div>
+      <div class="form-section">
+        <label>Receiving Facility / Specialist</label>
+        <input type="text" name="referred_to" placeholder="e.g. Cardiology Department or St. Luke’s Hospital">
+      </div>
+      <div class="form-section">
+        <label>Additional Notes</label>
+        <textarea name="notes" rows="2"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">Send Referral</button>
+        <button type="button" class="btn btn-secondary" id="closeReferral">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.getElementById("referBtn").onclick = () =>
+  document.getElementById("referralModal").style.display = "block";
+
+document.getElementById("closeReferral").onclick = () =>
+  document.getElementById("referralModal").style.display = "none";
+
+window.onclick = (event) => {
+  if (event.target.classList.contains("modal")) {
+    event.target.style.display = "none";
+  }
+};
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const modal = document.getElementById("prescriptionModal");
+  const form = document.getElementById("prescriptionForm");
+  const modalTitle = document.getElementById("modalTitle");
+  const closeBtn = document.getElementById("closePrescriptionModal");
+
+  const admitBtn = document.getElementById("admitBtn");
+  const outpatientBtn = document.getElementById("outpatientBtn");
+
+  admitBtn.onclick = () => openModal("Admit");
+  outpatientBtn.onclick = () => openModal("Outpatient");
+
+  closeBtn.onclick = () => modal.style.display = "none";
+
+  function openModal(type) {
+    modalTitle.textContent = `${type} Prescription`;
+    form.action = `/doctor/prescribe/{{ patient.id }}/${type.toLowerCase()}`;
+    modal.style.display = "flex";
+  }
+
+  window.onclick = (e) => {
+    if (e.target === modal) modal.style.display = "none";
+  };
+});
+
+
+document.getElementById("investigationBtn").addEventListener("click", function() {
+    window.location.href = "{{ url_for('doctor.request_investigation', patient_id=patient.id) }}";
+});
+</script>
+
+{% endblock %}
+
+
+<style>
+/* Layout */
+.clerk-layout {
+  display: grid;
+  grid-template-columns: 70% 28%;
+  gap: 2%;
+  margin: 20px auto;
+  max-width: 1200px;
+}
+.clerk-main {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+h2 { color: #043873; }
+.form-section { margin-bottom: 15px; }
+label { display: block; font-weight: bold; color: #333; margin-bottom: 5px; }
+textarea, input, select {
+  width: 100%; border: 1px solid #ccc; border-radius: 8px; padding: 10px;
+}
+.patient-sidebar {
+  background: #f9fafb; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04); overflow-y: auto; max-height: 90vh;
+}
+.action-buttons {
+  display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;
+}
+.btn {
+  border: none; border-radius: 8px; padding: 10px 15px; cursor: pointer;
+  font-weight: 600; text-decoration: none;
+}
+.btn-primary { background-color: #2563eb; color: white; }
+.btn-primary:hover { background-color: #1d4ed8; }
+.btn-secondary { background: #e2e8f0; color: #1e3a8a; }
+.btn-info { background-color: #0ea5e9; color: white; }
+.btn-warning { background-color: #f59e0b; color: white; }
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  max-width: 500px;
+  margin: 8% auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.modal-actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.checkbox-list label {
+  display: block;
+  margin: 5px 0;
+}
+
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  justify-content: center; align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 450px;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+</style>

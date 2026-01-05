@@ -1,12 +1,43 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from app.models import db, User
-from werkzeug.security import generate_password_hash
-from flask import Blueprint
+from app.models.user import db, User
+from app.models.patients import Patient
+from app.models.employee import Employee, check_password_hash
+from app.extensions import login_manager
+from sqlalchemy import func
 
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id.startswith("patient-"):
+        return Patient.query.get(int(user_id.split("-")[1]))
+    elif user_id.startswith("employee-"):
+        return Employee.query.get(int(user_id.split("-")[1]))
+    elif user_id.startswith("admin-"):
+        return User.query.get(int(user_id.split("-")[1]))
+    return None
+
+# @auth_bp.route("/login", methods=["GET", "POST"])
+# def login():
+#     if request.method == "POST":
+#         identifier = request.form.get("identifier").lower()
+#         password = request.form.get("password")
+
+#         patient = Patient.query.filter_by(email=identifier).first()
+#         if patient and password == patient.hospital_number:
+#             login_user(patient)
+#             return redirect(url_for("patients.dashboard"))
+
+#         flash("Invalid credentials", "danger")
+#         return redirect(url_for("auth.login"))
+
+#     return render_template("admin/login.html")
+
 
 
 # User logout
@@ -17,147 +48,75 @@ def logout():
     flash("You have been logged out.", "info")
     return redirect(url_for("auth.login"))
 
-# Create initial super admin (for setup only!)
-@auth_bp.route("/create_super_admin")
-def create_super_admin():
-    if User.query.filter_by(username="superadmin").first():
-        flash("Super admin already exists!", "warning")
-        return redirect(url_for("auth.login"))
 
-    super_admin = User(username="superadmin", role="super_admin")
-    super_admin.set_password("supersecure123")
-    db.session.add(super_admin)
-    db.session.commit()
-    flash("Super admin account created! Username: superadmin", "success")
-    return redirect(url_for("auth.login"))
-
+ALLOWED_ROLES = {"doctor", "nurse", "admin"}
 
 # User login
+# User login
+
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username")
+        identifier = request.form.get("identifier")
         password = request.form.get("password")
 
-        user = User.query.filter_by(username=username).first()
-        if user and user.check_password(password):
-            login_user(user)
-            flash("✅ Login successful!", "success")
-            # Redirect to the dashboard / index page
-            return redirect(url_for("index"))
-        else:
-            flash("❌ Invalid username or password", "danger")
+        if not identifier or not password:
+            flash("Please enter both identifier and password.", "danger")
+            return redirect(url_for("auth.login"))
 
-    # GET request renders login page
-    return render_template("auth/login.html")
+        identifier = identifier.strip().lower()
 
-from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_required
-from app import db
-from app.models import User
-from app.views.auth import auth_bp
+        # -------------------------------
+        # 1️⃣ Superadmin login (username)
+        # -------------------------------
+        superadmin = User.query.filter(func.lower(User.username) == identifier).first()
+        if superadmin and superadmin.check_password(password):
+            login_user(superadmin)
+            return redirect(url_for("auth.index"))
 
+        # -------------------------------
+        # 2️⃣ Employee login (email)
+        # -------------------------------
+        employee = Employee.query.join(Employee.role).filter(
+            func.lower(Employee.email) == identifier
+        ).first()
 
-# ==============================
-# View & Manage Admins
-# ==============================
-@auth_bp.route("/manage_admins")
-def manage_admins():
-    admins = User.query.filter(User.role.in_([
-        "admin", "super_admin",
-        "Nursing_Admin", "Doctor_Admin", "Record_Admin",
-        "Pharmacy_Admin", "Finance_Admin"
-    ])).all()
+        if employee:
+            emp_role = employee.role.name.lower() if employee.role else None
+            if emp_role not in ALLOWED_ROLES:
+                flash("You are not authorized to access this system.", "danger")
+                return redirect(url_for("auth.login"))
 
-    return render_template("auth/manage_admins.html", admins=admins)
+            if employee.check_password(password):
+                login_user(employee)
+                # Redirect based on role
+                if emp_role == "doctor":
+                    return redirect(url_for("doctor.dashboard"))
+                elif emp_role == "nurse":
+                    return redirect(url_for("nurse.dashboard"))
+                elif emp_role == "admin":
+                    return redirect(url_for("admin.dashboard"))
 
+        # -------------------------------
+        # 3️⃣ Patient login (email)
+        # -------------------------------
+        patient = Patient.query.filter(func.lower(Patient.email) == identifier).first()
+        if patient and password == patient.hospital_number:
+            login_user(patient)
+            return redirect(url_for("patient_chat.dashboard"))
 
-# ==============================
-# Add Admin
-# ==============================
-@auth_bp.route("/add_admin", methods=["GET", "POST"])
-def add_admin():
-    if request.method == "POST":
-        username = request.form.get("username").strip()
-        password = request.form.get("password").strip()
-        role = request.form.get("role")
-
-        if User.query.filter_by(username=username).first():
-            flash("⚠️ Username already exists. Try another.", "warning")
-            return redirect(url_for("auth.add_admin"))
-
-        hashed_pw = generate_password_hash(password)
-        new_admin = User(username=username, password_hash=hashed_pw, role=role)
-        db.session.add(new_admin)
-        db.session.commit()
-
-        flash(f"✅ Admin '{username}' ({role}) created successfully!", "success")
-        return redirect(url_for("auth.manage_admins"))
-
-    return render_template("auth/add_admin.html")
-
-
-
-# ==============================
-# Reset Admin Account
-# ==============================
-@auth_bp.route("/reset_admin/<int:user_id>", methods=["GET", "POST"])
-def reset_admin(user_id):
-    user = User.query.get_or_404(user_id)
-
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-
-        if username and username.strip() != "":
-            existing = User.query.filter_by(username=username).first()
-            if existing and existing.id != user.id:
-                flash("⚠️ Username already taken.", "warning")
-                return redirect(url_for("auth.reset_admin", user_id=user.id))
-            user.username = username.strip()
-
-        if password and password.strip() != "":
-            user.password_hash = generate_password_hash(password.strip())
-
-        db.session.commit()
-        flash(f"✅ Admin '{user.username}' updated successfully!", "success")
-        return redirect(url_for("auth.manage_admins"))
-
-    return render_template("auth/reset_admin.html", user=user)
-
-
-# ==============================
-# Delete Admin
-# ==============================
-@auth_bp.route("/delete_admin/<int:user_id>", methods=["POST"])
-def delete_admin(user_id):
-    admin = User.query.get_or_404(user_id)
-    if admin.role == "super_admin":
-        flash("⚠️ You cannot delete a Super Admin!", "danger")
-        return redirect(url_for("auth.manage_admins"))
-
-    db.session.delete(admin)
-    db.session.commit()
-    flash(f"🗑️ Admin '{admin.username}' deleted successfully.", "info")
-    return redirect(url_for("auth.manage_admins"))
-
-# Reset admin/superadmin password
-@auth_bp.route("/reset_superadmin", methods=["GET", "POST"])
-def reset_superadmin():
-    user = User.query.filter_by(username="superadmin").first()
-    if not user:
-        flash("⚠️ Superadmin not found in the system.", "danger")
+        # -------------------------------
+        # 4️⃣ No match
+        # -------------------------------
+        flash("Invalid username/email or password.", "danger")
         return redirect(url_for("auth.login"))
 
-    # Reset password
-    user.set_password("supersecure123")
-    db.session.commit()
-
-    flash("✅ Superadmin password has been reset to 'supersecure123'. Please change it after login.", "success")
-    return redirect(url_for("auth.login"))
+    # GET request
+    return render_template("admin/login.html")
 
 
-@auth_bp.route('/list_users')
-def list_users():
-    users = User.query.all()
-    return render_template("auth/list_users.html", users=users)
+@auth_bp.route("/")
+def index():
+    from app.models.lab import LabVisit
+    latest_visit = LabVisit.query.order_by(LabVisit.id.desc()).first()
+    return render_template("index.html", latest_visit=latest_visit)

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+  <h2>🧾 Add New Patient (Record Department)</h2>
+  <form method="POST" action="{{ url_for('patients.new_patient') }}">
+    <div class="form-grid">
+
+      <label>First Name</label>
+      <input type="text" name="first_name" required>
+
+      <label>Middle Name</label>
+      <input type="text" name="middle_name">
+
+      <label>Surname</label>
+      <input type="text" name="surname" required>
+
+      <label>Date of Birth</label>
+      <input type="date" name="date_of_birth">
+
+      <label>Sex</label>
+      <select name="sex" required>
+        <option value="">-- Select Sex --</option>
+        <option value="MALE">Male</option>
+        <option value="FEMALE">Female</option>
+      </select>
+
+      <label>Address</label>
+      <input type="text" name="address">
+
+      <label>Phone Number</label>
+      <input type="text" name="phone_number">
+
+      <label>Email</label>
+      <input type="email" name="email">
+
+      <label>Marital Status</label>
+      <select name="marital_status">
+        <option value="">-- Select --</option>
+        <option value="Single">Single</option>
+        <option value="Married">Married</option>
+        <option value="Divorced">Divorced</option>
+        <option value="Widowed">Widowed</option>
+      </select>
+
+      <label>Occupation</label>
+      <input type="text" name="occupation">
+
+      <label>Religion</label>
+      <input type="text" name="religion">
+
+      <label>Next of Kin Name</label>
+      <input type="text" name="next_of_kin_name">
+
+      <label>Next of Kin Phone</label>
+      <input type="text" name="next_of_kin_phone">
+
+      <label>Next of Kin Relationship</label>
+      <input type="text" name="next_of_kin_relationship">
+
+      <label>NHIS Status</label>
+      <select name="nhis_status">
+        <option value="NON_NHIS">Non-NHIS</option>
+        <option value="NHIS">NHIS</option>
+      </select>
+
+    </div>
+    <button type="submit" class="btn">Save Patient</button>
+  </form>
+</div>
+{% endblock %}
