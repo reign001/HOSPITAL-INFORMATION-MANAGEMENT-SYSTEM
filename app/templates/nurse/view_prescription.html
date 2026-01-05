@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Prescription</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <a href="{{ url_for('nurse.dashboard') }}" class="btn-dashboard">⬅ Back to Dashboard</a>
+
+    <h3>💊 Prescription for {{ patient.full_name() }}</h3>
+
+    {% if prescription %}
+      <div class="prescription-box">
+        <p><strong>Date:</strong> {{ prescription.created_at.strftime("%B %d, %Y") }}</p>
+        <textarea readonly class="readonly-area">{{ prescription.drugs }}</textarea>
+      </div>
+    {% else %}
+      <p>No prescription found for this patient.</p>
+    {% endif %}
+
+    <div class="footer-links">
+      <a href="{{ url_for('nurse.patient_folder', patient_id=patient.id) }}">🗂 Patient Folder</a>
+    </div>
+  </div>
+</body>
+</html>
+<style>
+
+    /* static/css/style.css */
+
+/* Reset and Base Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #333;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+/* Container */
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header & Back Button */
+.btn-dashboard {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #4a90e2;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  margin: 1.5rem;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.btn-dashboard:hover {
+  background: #357abd;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+}
+
+.btn-dashboard:active {
+  transform: translateY(0);
+}
+
+/* Title */
+h3 {
+  text-align: center;
+  margin: 1.5rem 1.5rem 2rem;
+  font-size: 1.8rem;
+  color: #2c3e50;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+h3::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: #4a90e2;
+  border-radius: 2px;
+}
+
+/* Prescription Box */
+.prescription-box {
+  margin: 0 1.5rem 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border-left: 5px solid #4a90e2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.prescription-box p {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.prescription-box p strong {
+  color: #2c3e50;
+}
+
+/* Readonly Textarea */
+.readonly-area {
+  width: 100%;
+  min-height: 180px;
+  padding: 1rem;
+  font-size: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: none;
+  color: #2c3e50;
+  line-height: 1.7;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.readonly-area:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+/* No Prescription Message */
+p:where(:not(.prescription-box p)) {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #e74c3c;
+  font-weight: 500;
+  margin: 2rem 1.5rem;
+  padding: 1.5rem;
+  background: #fdf2f2;
+  border-radius: 12px;
+  border: 1px dashed #fabcbc;
+}
+
+/* Footer Links */
+.footer-links {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f0f4f8;
+  border-top: 1px solid #e0e6ed;
+}
+
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  background: white;
+  border: 2px solid #4a90e2;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(74, 144, 226, 0.15);
+}
+
+.footer-links a:hover {
+  background: #4a90e2;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(74, 144, 226, 0.25);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    margin: 1rem auto;
+    border-radius: 12px;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  h3::before {
+    width: 60px;
+  }
+
+  .btn-dashboard,
+  .footer-links a {
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem;
+  }
+
+  .prescription-box,
+  .footer-links {
+    margin: 0 1rem 1.5rem;
+  }
+
+  .prescription-box {
+    padding: 1.25rem;
+  }
+
+  .readonly-area {
+    min-height: 160px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 0.5rem;
+  }
+
+  .container {
+    margin: 0.5rem auto;
+  }
+
+  .btn-dashboard {
+    margin: 1rem;
+    width: calc(100% - 2rem);
+    justify-content: center;
+  }
+
+  h3 {
+    margin: 1rem 1rem 1.5rem;
+    font-size: 1.4rem;
+  }
+
+  .footer-links a {
+    width: calc(100% - 2rem);
+    justify-content: center;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+  }
+
+  .container {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  .btn-dashboard,
+  .footer-links {
+    display: none;
+  }
+
+  .prescription-box {
+    border-left: 3px solid #333;
+  }
+}
+</style>
+{% endblock %}
