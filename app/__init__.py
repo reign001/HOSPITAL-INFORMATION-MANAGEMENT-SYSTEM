@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from app.extensions import db, migrate, login_manager
+from sqlalchemy import func
 
 
 def create_app():
