@@ -4,7 +4,8 @@ from app.extensions import db, migrate, login_manager
 
 def create_app():
     app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://postgres:John4u.com@localhost:5432/hospital_db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://neondb_owner:npg_BeF3DsWwOnq5@ep-tiny-shape-ah6paoay-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+    # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://postgres:John4u.com@localhost:5432/hospital_db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = "supersecret"
 
