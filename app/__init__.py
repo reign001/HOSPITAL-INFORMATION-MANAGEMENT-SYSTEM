@@ -65,31 +65,24 @@ def create_app():
     password = os.getenv("SUPERADMIN_PASSWORD")
     with app.app_context():
         try:
-            # Ensure role exists
-            sa_role = Role.query.filter(
-                func.lower(Role.name) == "superadmin"
-            ).first()
-
-            if not sa_role:
-                sa_role = Role(name="superadmin")
-                db.session.add(sa_role)
-                db.session.commit()
-                print("Superadmin role created")
-
-            # Ensure user exists
-            super_admin = User.query.filter_by(username="superadmin").first()
-
-            if not super_admin:
+            # Check if superadmin exists
+            if not User.query.filter_by(username="superadmin").first():
+                
+                # Ensure the role exists, default to string 'super_admin'
+                sa_role_name = "super_admin"
+                
+                # Create the superadmin
                 super_admin = User(
                     username="superadmin",
-                    role_id=sa_role.id
+                    role=sa_role_name
                 )
-                super_admin.set_password(password)
+                super_admin.set_password("supersecure123")
+                
                 db.session.add(super_admin)
                 db.session.commit()
+                print("Super admin created! (username: superadmin / password: supersecure123)")
             else:
                 print("Super admin already exists")
-
         except Exception as e:
             print(f"⚠️ Could not create/check superadmin: {e}")
 
