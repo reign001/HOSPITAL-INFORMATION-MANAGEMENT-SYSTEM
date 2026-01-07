@@ -64,7 +64,7 @@ def dashboard():
     # -------------------------------------------
     # NEW: Message notifications for the doctor
     # -------------------------------------------
-    doctor_user_id = f"employee-{current_user.id}"
+    doctor_user_id = current_user.id
 
     # Get only unread messages
     unread_messages = Message.query.filter_by(

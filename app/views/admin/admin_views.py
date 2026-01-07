@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash
 from app import db
 from datetime import date
 from app.models.employee import Employee, Role, ShiftEnum, EmployeeShift
+from app.models.user import User
 from app.models.patients import PatientRequest
 from sqlalchemy import func
 
@@ -77,6 +78,7 @@ def dashboard():
 @admin_bp.route("/add-employee", methods=["GET", "POST"])
 def add_employee():
     roles = Role.query.all()
+    users= User.query.all()
 
     if request.method == "POST":
         first_name = request.form.get("first_name")
@@ -105,7 +107,7 @@ def add_employee():
         flash(f"Employee {first_name} {surname} added successfully!", "success")
         return redirect(url_for("admin.dashboard"))
 
-    return render_template("admin/add_employee.html", roles=roles)
+    return render_template("admin/add_employee.html", roles=roles, users=users)
 
 
 

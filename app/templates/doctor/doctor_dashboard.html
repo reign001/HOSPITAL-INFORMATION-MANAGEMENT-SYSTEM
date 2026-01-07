@@ -273,7 +273,7 @@
   <!-- Main Content -->
   <main class="main-content">
     <header class="dashboard-header">
-      <h1>Welcome, Dr. {{ current_user.role_name if current_user.is_authenticated else '' }}</h1>
+      <h1>Welcome, Dr. {{ current_user.first_name if current_user.is_authenticated else '' }}</h1>
       <div class="profile">
         <span>{{ current_user.first_name }}</span>
       </div>
