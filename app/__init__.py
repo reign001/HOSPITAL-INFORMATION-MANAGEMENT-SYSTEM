@@ -3,7 +3,9 @@ from app.extensions import db, migrate, login_manager
 from sqlalchemy import func
 
 
+
 def create_app():
+    import os
     app = Flask(__name__)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
     "DATABASE_URL",
