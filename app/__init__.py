@@ -64,6 +64,7 @@ def create_app():
     import os
     password = os.getenv("SUPERADMIN_PASSWORD")
     with app.app_context():
+        db.create_all()
         try:
             # Check if superadmin exists
             if not User.query.filter_by(username="superadmin").first():
