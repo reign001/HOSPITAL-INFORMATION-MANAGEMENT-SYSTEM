@@ -61,19 +61,38 @@ def create_app():
     app.register_blueprint(delivery_bp)
 
     # Create superadmin automatically if not exists
+    import os
+    password = os.getenv("SUPERADMIN_PASSWORD")
     with app.app_context():
         try:
-            if not User.query.filter_by(username="superadmin").first():
-                sa_role = Role.query.filter(func.lower(Role.name) == "superadmin").first()
-                super_admin = User(username="superadmin", role_id=sa_role.id)
-                super_admin.set_password("supersecure123")
+            # Ensure role exists
+            sa_role = Role.query.filter(
+                func.lower(Role.name) == "superadmin"
+            ).first()
+
+            if not sa_role:
+                sa_role = Role(name="superadmin")
+                db.session.add(sa_role)
+                db.session.commit()
+                print("Superadmin role created")
+
+            # Ensure user exists
+            super_admin = User.query.filter_by(username="superadmin").first()
+
+            if not super_admin:
+                super_admin = User(
+                    username="superadmin",
+                    role_id=sa_role.id
+                )
+                super_admin.set_password(password)
                 db.session.add(super_admin)
                 db.session.commit()
-                print("Super admin created! (username: superadmin / password: supersecure123)")
             else:
                 print("Super admin already exists")
+
         except Exception as e:
             print(f"⚠️ Could not create/check superadmin: {e}")
+
 
     # Home route
     @app.route("/")
