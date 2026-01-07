@@ -5,10 +5,15 @@ from sqlalchemy import func
 
 def create_app():
     app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://neondb_owner:npg_BeF3DsWwOnq5@ep-tiny-shape-ah6paoay-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+    "DATABASE_URL",
+    "postgresql://neondb_owner:npg_BeF3DsWwOnq5@ep-tiny-shape-ah6paoay-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+)
+    # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://neondb_owner:npg_BeF3DsWwOnq5@ep-tiny-shape-ah6paoay-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
     # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://postgres:John4u.com@localhost:5432/hospital_db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SECRET_KEY"] = "supersecret"
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "fallbacksecret")
+    # "supersecret"
 
     # Initialize extensions
     db.init_app(app)
@@ -64,8 +69,8 @@ def create_app():
     import os
     password = os.getenv("SUPERADMIN_PASSWORD")
     with app.app_context():
-        db.create_all()
         try:
+            db.create_all()
             # Check if superadmin exists
             if not User.query.filter_by(username="superadmin").first():
                 
