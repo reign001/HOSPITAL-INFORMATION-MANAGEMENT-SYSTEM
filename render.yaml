@@ -1,8 +1,9 @@
 services:
   - type: web
-    name: hospital-app
+    name: hospital-management-system
     env: python
     plan: free
-    runtime: python-3.11.9
+    runtime: python
+    pythonVersion: 3.11.9
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn wsgi:app
